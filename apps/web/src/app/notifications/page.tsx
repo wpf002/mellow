@@ -29,7 +29,7 @@ export default async function NotificationsPage() {
             </p>
           </Card>
         ) : (
-          <div className="space-y-2">
+          <div className="space-y-3">
             {items.map((n) => {
               const href = notificationHref(n.type, n.entityId, n.actor.handle);
               const name = n.actor.displayName;
