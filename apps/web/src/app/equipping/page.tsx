@@ -18,12 +18,12 @@ export default async function EquippingPage({
 
   return (
     <AppShell me={me} pillar="equipping" section="courses">
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-wrap gap-2">
+      <div className="mb-4 flex items-center gap-3">
+        <div className="flex min-w-0 flex-nowrap gap-2 overflow-x-auto pb-1">
           <Link
             href="/equipping"
             className={cn(
-              "rounded-full px-3 py-1.5 text-xs font-semibold transition",
+              "shrink-0 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-semibold transition",
               !category ? "bg-equipping text-white" : "border border-equipping/50 text-equipping-ink hover:bg-equipping-soft/50",
             )}
           >
@@ -34,7 +34,7 @@ export default async function EquippingPage({
               key={c}
               href={`/equipping?category=${c}`}
               className={cn(
-                "rounded-full px-3 py-1.5 text-xs font-semibold transition",
+                "shrink-0 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-semibold transition",
                 category === c ? "bg-equipping text-white" : "border border-equipping/50 text-equipping-ink hover:bg-equipping-soft/50",
               )}
             >
@@ -43,7 +43,7 @@ export default async function EquippingPage({
           ))}
         </div>
         {me && (
-          <Link href="/equipping/new">
+          <Link href="/equipping/new" className="shrink-0">
             <Button className="bg-equipping hover:brightness-95">Teach a course</Button>
           </Link>
         )}
