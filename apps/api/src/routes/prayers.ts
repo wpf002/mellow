@@ -14,7 +14,7 @@ import { serializePrayer, serializePrayers } from "../lib/serializePrayer.js";
 const idParams = z.object({ id: z.string().min(1) });
 const listQuery = cursorQuerySchema.extend({ author: handleSchema.optional() });
 
-const prayerInclude = { author: true, testimonial: true } as const;
+const prayerInclude = { author: true, testimonial: true, group: true } as const;
 
 /**
  * Where clause that enforces prayer visibility in the query layer (never the
@@ -35,6 +35,8 @@ function visibilityWhere(viewerId: string | null): Prisma.PrayerWhereInput {
           following: { some: { followingId: viewerId } }, // author follows viewer
         },
       },
+      // GROUP prayers are visible to members of the group.
+      { visibility: "GROUP", group: { members: { some: { userId: viewerId } } } },
     ],
   };
 }
@@ -80,7 +82,9 @@ export async function registerPrayerRoutes(app: FastifyInstance) {
 
     const viewerId = await getUserId(request);
 
-    const where: Prisma.PrayerWhereInput = { AND: [visibilityWhere(viewerId)] };
+    // The global wall and profile tab show standalone prayers; group prayers
+    // live in their group feed (GET /groups/:id/prayers).
+    const where: Prisma.PrayerWhereInput = { AND: [visibilityWhere(viewerId), { groupId: null }] };
     if (author) {
       const target = await prisma.user.findUnique({ where: { handle: author } });
       if (!target) return { items: [], nextCursor: null };

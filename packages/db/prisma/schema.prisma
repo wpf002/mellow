@@ -25,6 +25,13 @@ enum PrayerStatus {
   ANSWERED
 }
 
+// Role within a prayer group.
+enum GroupRole {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
 // ---------------------------------------------------------------------------
 // Auth (Better Auth core) + Mellow profile fields
 // Better Auth owns: name, email, emailVerified, image, timestamps, and the
@@ -61,6 +68,12 @@ model User {
   prayerLogs   PrayerLog[]
   comments     Comment[]
   testimonials Testimonial[]
+
+  // --- Groups + Prayer Life (Phase 3) ---
+  ownedGroups      PrayerGroup[]             @relation("groupOwner")
+  groupMemberships GroupMember[]
+  prayerDayMarks   PrayerDayMark[]
+  challenges       ChallengeParticipation[]
 
   @@index([handle])
 }
@@ -146,6 +159,10 @@ model Prayer {
   updatedAt  DateTime     @updatedAt
   answeredAt DateTime? // set when status flips to ANSWERED
 
+  // Set when the prayer is posted into a group (visibility = GROUP).
+  groupId String?
+  group   PrayerGroup? @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
   logs        PrayerLog[]
   comments    Comment[]
   testimonial Testimonial? // one testimonial per answered prayer
@@ -154,6 +171,7 @@ model Prayer {
   // Wall + profile listing order (newest first) and cursor pagination.
   @@index([createdAt, id])
   @@index([visibility, createdAt])
+  @@index([groupId, createdAt])
 }
 
 // Append-only intercession event. A user may pray for the same request more
@@ -193,4 +211,78 @@ model Testimonial {
   author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
   body      String
   createdAt DateTime @default(now())
+}
+
+// ---------------------------------------------------------------------------
+// Group Prayer + Prayer Life (Phase 3) — completes the MVP.
+//
+// Prayer streaks are derived, never stored: PrayerDayMark records one row per
+// local day a user prayed (idempotent per day), and the streak/longest/challenge
+// progress are computed from those events in the user's timezone. Challenge
+// progress reuses the same PrayerDayMark events.
+// ---------------------------------------------------------------------------
+
+model PrayerGroup {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  ownerId     String
+  owner       User     @relation("groupOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  members GroupMember[]
+  prayers Prayer[]
+
+  @@index([createdAt, id])
+}
+
+model GroupMember {
+  groupId  String
+  group    PrayerGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  userId   String
+  user     User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role     GroupRole   @default(MEMBER)
+  joinedAt DateTime    @default(now())
+
+  @@id([groupId, userId])
+  @@index([userId])
+}
+
+// Append-only prayer-day event feeding streaks + challenge progress. One row per
+// user per local (timezone-aware) calendar day. `date` is that local day at UTC
+// midnight; adjacency is compared by calendar-day label, not wall-clock instant.
+model PrayerDayMark {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date      DateTime @db.Date
+  createdAt DateTime @default(now())
+
+  @@unique([userId, date])
+  @@index([userId, date])
+}
+
+model Challenge {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  startDate   DateTime @db.Date
+  endDate     DateTime @db.Date
+  createdAt   DateTime @default(now())
+
+  participants ChallengeParticipation[]
+
+  @@index([startDate])
+}
+
+model ChallengeParticipation {
+  challengeId String
+  challenge   Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  joinedAt    DateTime  @default(now())
+
+  @@id([challengeId, userId])
+  @@index([userId])
 }

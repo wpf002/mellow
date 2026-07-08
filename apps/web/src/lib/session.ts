@@ -1,5 +1,14 @@
 import { cookies } from "next/headers";
-import type { Comment, MeUser, Page, Prayer, PublicUser } from "@mellow/shared";
+import type {
+  Challenge,
+  Comment,
+  Group,
+  MeUser,
+  Page,
+  Prayer,
+  PublicUser,
+  Streak,
+} from "@mellow/shared";
 import { API_URL } from "./api";
 
 /** Server-side: forward the browser's cookies to the API to resolve the viewer. */
@@ -48,4 +57,39 @@ export async function getPrayerComments(id: string): Promise<Page<Comment>> {
   const res = await serverFetch(`/prayers/${encodeURIComponent(id)}/comments?limit=50`);
   if (!res.ok) return { items: [], nextCursor: null };
   return (await res.json()) as Page<Comment>;
+}
+
+/** All prayer groups (discovery). */
+export async function getGroups(): Promise<Page<Group>> {
+  const res = await serverFetch("/groups?limit=50");
+  if (!res.ok) return { items: [], nextCursor: null };
+  return (await res.json()) as Page<Group>;
+}
+
+/** A single group's metadata, or null. */
+export async function getGroup(id: string): Promise<Group | null> {
+  const res = await serverFetch(`/groups/${encodeURIComponent(id)}`);
+  if (!res.ok) return null;
+  return (await res.json()) as Group;
+}
+
+/** A group's prayer feed. Empty when the viewer is not a member (403). */
+export async function getGroupPrayers(id: string): Promise<Page<Prayer>> {
+  const res = await serverFetch(`/groups/${encodeURIComponent(id)}/prayers?limit=30`);
+  if (!res.ok) return { items: [], nextCursor: null };
+  return (await res.json()) as Page<Prayer>;
+}
+
+/** The signed-in user's prayer streak, or null. */
+export async function getStreak(): Promise<Streak | null> {
+  const res = await serverFetch("/prayer-life/streak");
+  if (!res.ok) return null;
+  return (await res.json()) as Streak;
+}
+
+/** Prayer challenges with the viewer's derived progress. */
+export async function getChallenges(): Promise<{ items: Challenge[] }> {
+  const res = await serverFetch("/challenges");
+  if (!res.ok) return { items: [] };
+  return (await res.json()) as { items: Challenge[] };
 }

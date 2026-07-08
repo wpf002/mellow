@@ -1,7 +1,17 @@
-import { prisma, type Prayer as PrayerRow, type Testimonial as TestimonialRow, type User } from "@mellow/db";
+import {
+  prisma,
+  type Prayer as PrayerRow,
+  type PrayerGroup,
+  type Testimonial as TestimonialRow,
+  type User,
+} from "@mellow/db";
 import type { Prayer, PrayerAuthor } from "@mellow/shared";
 
-type PrayerWithRelations = PrayerRow & { author: User; testimonial: TestimonialRow | null };
+type PrayerWithRelations = PrayerRow & {
+  author: User;
+  testimonial: TestimonialRow | null;
+  group: PrayerGroup | null;
+};
 
 function toAuthor(user: User): PrayerAuthor {
   return {
@@ -67,6 +77,7 @@ export async function serializePrayers(
     createdAt: p.createdAt.toISOString(),
     answeredAt: p.answeredAt ? p.answeredAt.toISOString() : null,
     author: toAuthor(p.author),
+    group: p.group ? { id: p.group.id, name: p.group.name } : null,
     uniquePrayed: uniqueByPrayer.get(p.id) ?? 0,
     totalPrayed: totalByPrayer.get(p.id) ?? 0,
     commentCount: commentByPrayer.get(p.id) ?? 0,

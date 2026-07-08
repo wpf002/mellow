@@ -5,6 +5,7 @@ import { AppShell } from "@/components/AppShell";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Avatar } from "@/components/Avatar";
 import { PrayerCard } from "@/components/PrayerCard";
+import { PrayerSubnav } from "@/components/PrayerSubnav";
 import { Button, Card } from "@/components/ui";
 
 export default async function HomePage() {
@@ -47,6 +48,7 @@ export default async function HomePage() {
 
   return (
     <AppShell me={me} pillar="prayer">
+      <PrayerSubnav active="wall" />
       {/* Compose prompt */}
       <Card className="mb-4 flex items-center gap-3 p-4">
         <Avatar name={me.displayName ?? me.handle ?? "You"} src={me.avatarUrl} size={40} />

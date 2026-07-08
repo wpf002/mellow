@@ -83,6 +83,8 @@ export const prayerSchema = z.object({
   createdAt: z.string(),
   answeredAt: z.string().nullable(),
   author: prayerAuthorSchema,
+  // Set when the prayer was posted into a group (visibility = GROUP).
+  group: z.object({ id: z.string(), name: z.string() }).nullable(),
   // Derived, never stored:
   uniquePrayed: z.number().int().nonnegative(),
   totalPrayed: z.number().int().nonnegative(),

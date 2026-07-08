@@ -64,7 +64,25 @@ Better Auth is pinned to **`~1.2.12`** (the last zod-3 line) and `package.json` 
   testimonial → answered state renders; PUBLIC/PRIVATE/FRIENDS(mutual-follow) visibility; 401/403/409
   guards. Visibility rule: `FRIENDS` = **mutual follow**; `GROUP` deferred to Phase 3 (author-only
   for now); compose offers PUBLIC/FRIENDS/PRIVATE.
-- **Next: Phase 3** — Group Prayer + Prayer Life (groups, `PrayerDayMark` streaks, challenges).
+- **Phase 3** (Group Prayer + Prayer Life — completes the MVP) — **built + verified in browser +
+  committed/pushed.** Models `PrayerGroup` / `GroupMember` / `PrayerDayMark` / `Challenge` /
+  `ChallengeParticipation` + `GroupRole` enum + `Prayer.groupId` (migration
+  `phase3_groups_prayer_life`). API: `routes/groups.ts` (CRUD, join/leave, post-into-group, member-
+  gated feed), `routes/prayerLife.ts` (`/prayer-life/mark` + `/streak`, tz-aware via `lib/streak.ts`),
+  `routes/challenges.ts` (create/list/join, derived progress). GROUP visibility now wired to
+  membership; group prayers are kept off the global wall/profile. Shared: `group.ts` / `prayerLife.ts`
+  / `challenge.ts`. Web: `/groups`, `/groups/[id]`, `/prayer-life` (+ `PrayerSubnav` Wall/Groups/
+  Prayer Life). Streaks + challenge progress are **derived from append-only `PrayerDayMark` events**,
+  computed in the user's timezone — verified across a tz midnight (Chicago day ≠ UTC day) and with a
+  consecutive-run-with-gap streak.
+- **MVP (Phases 0–3) is complete.** Next per plan: Phase 4 (Fellowship Feed + Messaging).
+
+### API gotcha (Phase 3 fix — don't revert)
+`apps/api/src/server.ts` registers a custom `application/json` content-type parser that treats an
+**empty body as `undefined`**. The web client (`apiFetch`) sends `Content-Type: application/json` on
+every request including bodyless POSTs (follow, `/pray`, group join/leave, `/prayer-life/mark`);
+Fastify's default parser 400s those with `FST_ERR_CTP_EMPTY_JSON_BODY`. This was latent through
+Phases 1–2 (those POSTs were only ever curl-tested without the header).
 
 ## Web bundler note (Phase 1 fix — don't revert)
 `apps/web` builds with **Webpack**, not Turbopack (`dev`/`build` use `--webpack`; `next.config.ts`
