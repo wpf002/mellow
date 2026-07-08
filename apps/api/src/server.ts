@@ -11,6 +11,7 @@ import { registerPostRoutes } from "./routes/posts.js";
 import { registerMessageRoutes } from "./routes/messages.js";
 import { registerReputationRoutes } from "./routes/reputation.js";
 import { registerCompanionRoutes } from "./routes/companion.js";
+import { registerCallingRoutes } from "./routes/calling.js";
 
 async function main() {
   const app = Fastify({ logger: true });
@@ -53,6 +54,7 @@ async function main() {
   await registerMessageRoutes(app);
   await registerReputationRoutes(app);
   await registerCompanionRoutes(app);
+  await registerCallingRoutes(app);
 
   const port = Number(process.env.API_PORT ?? 4000);
   await app.listen({ port, host: "0.0.0.0" });

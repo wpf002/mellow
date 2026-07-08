@@ -40,6 +40,20 @@ enum ReactionType {
   LOVE
 }
 
+// Calling Center listing kind. Covers employment, volunteering, and missions.
+enum JobType {
+  FULL_TIME
+  PART_TIME
+  CONTRACT
+  VOLUNTEER
+  MISSION
+}
+
+enum JobStatus {
+  OPEN
+  CLOSED
+}
+
 // What kind of service earned reputation. Weights live in code (pure config),
 // so history is stable if weights are re-tuned.
 enum ReputationCategory {
@@ -105,6 +119,10 @@ model User {
   // --- Reputation & Achievements (Phase 5, off-chain) ---
   reputationEvents ReputationEvent[]
   achievements     UserAchievement[]
+
+  // --- Calling Center (Phase 7) ---
+  jobListings   JobListing[]
+  talentProfile TalentProfile?
 
   @@index([handle])
 }
@@ -452,4 +470,45 @@ model UserAchievement {
 
   @@id([userId, achievementId])
   @@index([userId])
+}
+
+// ---------------------------------------------------------------------------
+// Calling Center (Phase 7) — the listings SURFACE only. Deliberately deferred
+// behind legal/product review: any transaction mechanics (fees, payouts,
+// escrow), match AI, and application pipelines. Contact happens through the
+// existing 1:1 messaging; no money moves through Mellow.
+// ---------------------------------------------------------------------------
+
+model JobListing {
+  id          String    @id @default(cuid())
+  posterId    String
+  poster      User      @relation(fields: [posterId], references: [id], onDelete: Cascade)
+  title       String
+  orgName     String? // church / ministry / company; optional for individuals
+  description String
+  location    String? // free text; null when fully remote
+  remote      Boolean   @default(false)
+  type        JobType   @default(FULL_TIME)
+  status      JobStatus @default(OPEN)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([status, createdAt])
+  @@index([posterId])
+}
+
+// Opt-in talent directory entry. One per user; `visible` controls listing.
+model TalentProfile {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  headline     String
+  about        String?
+  skills       String[] @default([])
+  availability String? // free text, e.g. "Evenings + weekends", "Full-time from March"
+  visible      Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([visible, updatedAt])
 }

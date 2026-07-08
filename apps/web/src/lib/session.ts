@@ -5,6 +5,8 @@ import type {
   Comment,
   Conversation,
   Group,
+  Job,
+  JobType,
   MeUser,
   Message,
   Page,
@@ -15,6 +17,7 @@ import type {
   PublicUser,
   Reputation,
   Streak,
+  Talent,
 } from "@mellow/shared";
 import { API_URL } from "./api";
 
@@ -149,6 +152,36 @@ export async function getAchievements(handle: string): Promise<{ items: Achievem
   const res = await serverFetch(`/users/${encodeURIComponent(handle)}/achievements`);
   if (!res.ok) return { items: [] };
   return (await res.json()) as { items: AchievementView[] };
+}
+
+/** Open Calling Center listings, optionally filtered by type. */
+export async function getJobs(type?: JobType): Promise<Page<Job>> {
+  const qs = type ? `&type=${type}` : "";
+  const res = await serverFetch(`/jobs?limit=50${qs}`);
+  if (!res.ok) return { items: [], nextCursor: null };
+  return (await res.json()) as Page<Job>;
+}
+
+/** A single listing (closed ones remain reachable by link), or null. */
+export async function getJob(id: string): Promise<Job | null> {
+  const res = await serverFetch(`/jobs/${encodeURIComponent(id)}`);
+  if (!res.ok) return null;
+  return (await res.json()) as Job;
+}
+
+/** The visible talent directory. */
+export async function getTalent(): Promise<Page<Talent>> {
+  const res = await serverFetch("/talent?limit=50");
+  if (!res.ok) return { items: [], nextCursor: null };
+  return (await res.json()) as Page<Talent>;
+}
+
+/** The viewer's own talent entry (any visibility), or null. */
+export async function getMyTalent(): Promise<Talent | null> {
+  const res = await serverFetch("/talent/me");
+  if (!res.ok) return null;
+  const data = (await res.json()) as Talent | { profile: null };
+  return "profile" in data ? null : data;
 }
 
 /** Messages in a conversation (oldest-first) plus the other participant. */

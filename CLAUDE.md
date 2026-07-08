@@ -123,6 +123,20 @@ Better Auth is pinned to **`~1.2.12`** (the last zod-3 line) and `package.json` 
   to the draft — user posts, not the AI) + `ThreadSummaryButton` on prayer detail; both hidden when
   `/companion/status` says disabled. **To activate:** set `ANTHROPIC_API_KEY` in `.env` (see
   `.env.example`); restart API. All phases 0–6 complete; deferred backlog still needs Will's go.
+- **Phase 7** (Calling Center — the green pillar, **listings surface only**) — **built + verified in
+  browser + committed/pushed.** Per Will's scope call, the pillar ships as a real product surface
+  (not "coming soon"), but **all marketplace mechanics stay deferred behind review**: no fees,
+  payouts, escrow, applications pipeline, or match AI — contact happens through the existing 1:1
+  messaging and **no money moves through Mellow**. Models `JobListing` + `JobType`/`JobStatus` enums,
+  `TalentProfile` (one per user, `visible` opt-in) (migration `phase7_calling_center`). API in
+  `apps/api/src/routes/calling.ts`: `/jobs` create/list(OPEN, `?type=` filter)/detail/`:id/close`
+  (poster-only 403 guard), `/talent` PUT-upsert + `/talent/me` + `/talent` directory (visible only).
+  Shared: `calling.ts` (`JOB_TYPE_LABEL` shared web+api). Web: `/calling` openings board with type
+  filter chips, `/calling/new`, `/calling/[id]` (reuses `MessageButton` to contact the poster +
+  `CloseJobButton`), `/calling/talent` directory + own-profile `TalentEditor` (+ `CallingSubnav`
+  Openings/Talent). Verified: post → browse → detail → contact reuses the existing 1:1 conversation
+  (Phase-4 dedupe) → close flips to Closed + drops off the board; non-poster close 403; talent
+  upsert + directory listing. **Equipping Center is still the last placeholder.**
 
 ### Dev env gotcha (Phase 4 — don't revert)
 `.claude/launch.json` pins **Node 24** for both `api` and `web` by prepending
