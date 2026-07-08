@@ -32,6 +32,14 @@ enum GroupRole {
   MEMBER
 }
 
+// Fellowship post reactions. Off-chain, no monetary value.
+enum ReactionType {
+  AMEN
+  PRAISE
+  PRAYING
+  LOVE
+}
+
 // ---------------------------------------------------------------------------
 // Auth (Better Auth core) + Mellow profile fields
 // Better Auth owns: name, email, emailVerified, image, timestamps, and the
@@ -74,6 +82,13 @@ model User {
   groupMemberships GroupMember[]
   prayerDayMarks   PrayerDayMark[]
   challenges       ChallengeParticipation[]
+
+  // --- Fellowship Feed + Messaging (Phase 4) ---
+  posts               Post[]
+  postReactions       PostReaction[]
+  postComments        PostComment[]
+  conversationMembers ConversationMember[]
+  messages            Message[]
 
   @@index([handle])
 }
@@ -285,4 +300,92 @@ model ChallengeParticipation {
 
   @@id([challengeId, userId])
   @@index([userId])
+}
+
+// ---------------------------------------------------------------------------
+// Fellowship Feed + Messaging (Phase 4)
+//
+// Post is the fellowship-pillar content entity (distinct from Prayer). The feed
+// ("Agape Algorithm" v0) is a pure, swappable ranking over visible posts —
+// chronological with follow-graph affinity; the AI re-rank arrives in Phase 6.
+// Reaction/comment counts and message unread counts are derived, never stored.
+// ---------------------------------------------------------------------------
+
+model Post {
+  id         String     @id @default(cuid())
+  authorId   String
+  author     User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  body       String
+  visibility Visibility @default(PUBLIC)
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  reactions PostReaction[]
+  comments  PostComment[]
+
+  @@index([authorId, createdAt])
+  @@index([createdAt, id])
+}
+
+model PostReaction {
+  postId    String
+  post      Post         @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      ReactionType
+  createdAt DateTime     @default(now())
+
+  // One reaction per user per post (changing type replaces it).
+  @@id([postId, userId])
+  @@index([postId])
+}
+
+model PostComment {
+  id        String   @id @default(cuid())
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  body      String
+  createdAt DateTime @default(now())
+
+  @@index([postId, createdAt])
+}
+
+// A conversation between two or more members. 1:1 DMs are the MVP; the schema
+// already supports groups.
+model Conversation {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt // bumped on each new message for list ordering
+
+  members  ConversationMember[]
+  messages Message[]
+
+  @@index([updatedAt])
+}
+
+model ConversationMember {
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // Read cursor: unread = messages after this from other members. Derived count.
+  lastReadAt     DateTime     @default(now())
+  joinedAt       DateTime     @default(now())
+
+  @@id([conversationId, userId])
+  @@index([userId])
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  senderId       String
+  sender         User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  body           String
+  createdAt      DateTime     @default(now())
+
+  @@index([conversationId, createdAt])
 }

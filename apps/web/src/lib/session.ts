@@ -2,9 +2,14 @@ import { cookies } from "next/headers";
 import type {
   Challenge,
   Comment,
+  Conversation,
   Group,
   MeUser,
+  Message,
   Page,
+  Post,
+  PostComment,
+  PrayerAuthor,
   Prayer,
   PublicUser,
   Streak,
@@ -92,4 +97,41 @@ export async function getChallenges(): Promise<{ items: Challenge[] }> {
   const res = await serverFetch("/challenges");
   if (!res.ok) return { items: [] };
   return (await res.json()) as { items: Challenge[] };
+}
+
+/** The fellowship feed (Agape Algorithm v0). */
+export async function getFeed(): Promise<Page<Post>> {
+  const res = await serverFetch("/feed?limit=30");
+  if (!res.ok) return { items: [], nextCursor: null };
+  return (await res.json()) as Page<Post>;
+}
+
+/** A single post, or null. */
+export async function getPost(id: string): Promise<Post | null> {
+  const res = await serverFetch(`/posts/${encodeURIComponent(id)}`);
+  if (!res.ok) return null;
+  return (await res.json()) as Post;
+}
+
+/** Comments on a post (chronological). */
+export async function getPostComments(id: string): Promise<Page<PostComment>> {
+  const res = await serverFetch(`/posts/${encodeURIComponent(id)}/comments?limit=50`);
+  if (!res.ok) return { items: [], nextCursor: null };
+  return (await res.json()) as Page<PostComment>;
+}
+
+/** The viewer's conversations. */
+export async function getConversations(): Promise<{ items: Conversation[] }> {
+  const res = await serverFetch("/conversations");
+  if (!res.ok) return { items: [] };
+  return (await res.json()) as { items: Conversation[] };
+}
+
+/** Messages in a conversation (oldest-first) plus the other participant. */
+export async function getConversationMessages(
+  id: string,
+): Promise<{ otherMember: PrayerAuthor | null; items: Message[] } | null> {
+  const res = await serverFetch(`/conversations/${encodeURIComponent(id)}/messages?limit=50`);
+  if (!res.ok) return null;
+  return (await res.json()) as { otherMember: PrayerAuthor | null; items: Message[] };
 }

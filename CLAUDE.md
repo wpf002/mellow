@@ -75,7 +75,26 @@ Better Auth is pinned to **`~1.2.12`** (the last zod-3 line) and `package.json` 
   Prayer Life). Streaks + challenge progress are **derived from append-only `PrayerDayMark` events**,
   computed in the user's timezone — verified across a tz midnight (Chicago day ≠ UTC day) and with a
   consecutive-run-with-gap streak.
-- **MVP (Phases 0–3) is complete.** Next per plan: Phase 4 (Fellowship Feed + Messaging).
+- **MVP (Phases 0–3) is complete.**
+- **Phase 4** (Fellowship Feed + Messaging) — **built + verified in browser + committed/pushed.**
+  Models `Post` / `PostReaction` / `PostComment` / `Conversation` / `ConversationMember` / `Message`
+  + `ReactionType` enum (migration `phase4_fellowship_messaging`). API: `routes/posts.ts` (create,
+  `/feed`, detail, react/unreact, comments) with `lib/serializePost.ts` (derived reaction rollup +
+  commentCount) and `lib/feedRanker.ts` — the **pure, swappable Agape Algorithm v0** (chronological
+  candidate window + follow-graph affinity; AI re-rank lands in Phase 6); `routes/messages.ts`
+  (conversations list/start with 1:1 dedupe, messages list/send, `/read`, derived unread). Shared:
+  `post.ts` / `message.ts`. Web: the **Fellowship pillar landing (`/fellowship`) is the feed**, plus
+  `/fellowship/[id]`, `/messages`, `/messages/[id]` (+ `FellowshipSubnav` Feed/Messages, `Message`
+  button on profiles). Chat is **polling** (3s; SSE/websockets deferred per plan). Verified: post →
+  feed (followed author affinity-boosted to top) → react (replace keeps total 1) + comment; two users
+  DM with unread badges, read receipts, dedupe, and a live message arriving via polling.
+- **Next per plan: Phase 5** (Reputation & Achievements — off-chain).
+
+### Dev env gotcha (Phase 4 — don't revert)
+`.claude/launch.json` pins **Node 24** for both `api` and `web` by prepending
+`$HOME/.nvm/versions/node/v24.15.0/bin` to PATH inside an `sh -c` wrapper. The machine's nvm default
+can revert to Node 18, which breaks Next.js (needs ≥20.9) and the API's `node --env-file` (needs
+≥20.6). If Node 24 isn't the installed version, update the pinned path.
 
 ### API gotcha (Phase 3 fix — don't revert)
 `apps/api/src/server.ts` registers a custom `application/json` content-type parser that treats an

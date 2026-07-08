@@ -7,3 +7,5 @@ export * from "./prayer.js";
 export * from "./group.js";
 export * from "./prayerLife.js";
 export * from "./challenge.js";
+export * from "./post.js";
+export * from "./message.js";

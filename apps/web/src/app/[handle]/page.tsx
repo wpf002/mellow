@@ -5,6 +5,7 @@ import { AppShell } from "@/components/AppShell";
 import { Avatar } from "@/components/Avatar";
 import { Button, Card } from "@/components/ui";
 import { FollowButton } from "@/components/FollowButton";
+import { MessageButton } from "@/components/MessageButton";
 import { PrayerCard } from "@/components/PrayerCard";
 
 export default async function ProfilePage({ params }: { params: Promise<{ handle: string }> }) {
@@ -28,7 +29,10 @@ export default async function ProfilePage({ params }: { params: Promise<{ handle
                   <Button variant="outline">Edit profile</Button>
                 </Link>
               ) : me ? (
-                <FollowButton handle={profile.handle!} initialFollowing={profile.isFollowedByViewer} />
+                <div className="flex gap-2">
+                  <MessageButton handle={profile.handle!} />
+                  <FollowButton handle={profile.handle!} initialFollowing={profile.isFollowedByViewer} />
+                </div>
               ) : (
                 <Link href="/sign-in">
                   <Button>Follow</Button>

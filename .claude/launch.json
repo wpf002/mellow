@@ -3,14 +3,20 @@
   "configurations": [
     {
       "name": "api",
-      "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["--filter", "@mellow/api", "dev"],
+      "runtimeExecutable": "sh",
+      "runtimeArgs": [
+        "-c",
+        "export PATH=\"$HOME/.nvm/versions/node/v24.15.0/bin:$PATH\"; exec pnpm --filter @mellow/api dev"
+      ],
       "port": 4000
     },
     {
       "name": "web",
       "runtimeExecutable": "sh",
-      "runtimeArgs": ["-c", "ulimit -n 10240; exec pnpm --filter @mellow/web dev"],
+      "runtimeArgs": [
+        "-c",
+        "ulimit -n 10240; export PATH=\"$HOME/.nvm/versions/node/v24.15.0/bin:$PATH\"; exec pnpm --filter @mellow/web dev"
+      ],
       "port": 3000
     }
   ]
