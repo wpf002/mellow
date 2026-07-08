@@ -106,7 +106,7 @@ export function LeftNav({
   );
 }
 
-/** Right utility rail: the "My Eternal Profile" card + contextual quick links. */
+/** Right utility rail: the "My Profile" card + contextual quick links. */
 export function RightRail({
   pillar,
   me,
@@ -130,7 +130,7 @@ export function RightRail({
           </div>
           <Link href={`/${me.handle}`} className="mt-3 block">
             <Button variant="outline" className="w-full">
-              My Eternal Profile
+              My Profile
             </Button>
           </Link>
         </Card>
