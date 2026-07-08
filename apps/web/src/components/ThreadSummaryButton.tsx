@@ -27,7 +27,7 @@ export function ThreadSummaryButton({ prayerId }: { prayerId: string }) {
     <div>
       {summary ? (
         <div className="rounded-xl border border-equipping/50 bg-equipping-soft/30 p-4">
-          <p className="text-xs font-semibold">✨ Companion Summary</p>
+          <p className="text-xs font-semibold">Companion Summary</p>
           <p className="mt-1 text-sm whitespace-pre-wrap">{summary}</p>
         </div>
       ) : (

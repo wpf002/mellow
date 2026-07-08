@@ -24,8 +24,8 @@ export default async function HomePage() {
               The one and only 100% free prayer app
             </h1>
             <p className="mx-auto mt-4 max-w-xl text-base opacity-95">
-              Share prayer requests, intercede for others across the world, and testify when prayers
-              are answered — connecting Christians worldwide.
+              Post a prayer request, pray for other people, and share the testimony when God
+              answers.
             </p>
             <div className="mt-8 flex justify-center gap-3">
               <Link href="/sign-up">

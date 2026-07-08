@@ -53,8 +53,8 @@ export default async function CallingPage({
         <Card className="p-10 text-center">
           <h2 className="text-lg font-semibold">No open callings{type ? " of this type" : ""} yet</h2>
           <p className="mx-auto mt-2 max-w-md text-sm text-muted">
-            Churches, ministries, and believers post openings here — jobs, volunteering, and
-            missions. Reaching out happens through messages; Mellow takes no fees.
+            Churches and ministries post paid roles, volunteer needs, and mission trips here. You
+            reach out through messages, and Mellow never takes a fee.
           </p>
         </Card>
       ) : (

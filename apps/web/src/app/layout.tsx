@@ -7,7 +7,7 @@ const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"]
 
 export const metadata: Metadata = {
   title: "Mellow — Prayer Social",
-  description: "The 100% free prayer app. Connecting Christians worldwide.",
+  description: "A free prayer app for Christians. Post prayer requests, pray for others, and share the testimony when God answers.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
