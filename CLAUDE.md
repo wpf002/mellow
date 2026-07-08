@@ -106,7 +106,9 @@ Better Auth is pinned to **`~1.2.12`** (the last zod-3 line) and `package.json` 
   re-eval) → browser day-mark emits FAITHFULNESS (8→11) → idempotent re-mark stays 11. **No
   backfill**: activity predating Phase 5 earns nothing (events are the source of truth).
 - **Phase 6** (AI Layer — **Claude via the Anthropic SDK, not Flint**, per Will) — **built +
-  committed/pushed; flag-off path verified in browser, live AI calls pending an API key.**
+  committed/pushed + verified LIVE in browser** (key now in gitignored `.env`; assist, thread
+  summary, and the Agape v1 re-rank all confirmed with real model output — the re-rank visibly
+  demoted a low-substance post below a substantive one; `ai_usage` token logs confirmed per call).
   `packages/ai` is the single Claude adapter (`@anthropic-ai/sdk`): `DEFAULT_MODEL` pinned in one
   constant (`claude-opus-4-8`, override via `AI_DEFAULT_MODEL`), lazy client, `complete()` logs
   **token usage on every call** (`ai_usage` JSON line), structured outputs via
