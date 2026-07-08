@@ -9,8 +9,8 @@
     },
     {
       "name": "web",
-      "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["--filter", "@mellow/web", "dev"],
+      "runtimeExecutable": "sh",
+      "runtimeArgs": ["-c", "ulimit -n 10240; exec pnpm --filter @mellow/web dev"],
       "port": 3000
     }
   ]
