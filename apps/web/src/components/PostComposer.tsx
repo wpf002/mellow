@@ -3,7 +3,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { createPostSchema, type PostVisibility } from "@mellow/shared";
 import { apiFetch } from "@/lib/api";
-import { Button, Card, Textarea } from "./ui";
+import { Button, Card, Input, Textarea } from "./ui";
 
 const visibilityOptions: { value: PostVisibility; label: string }[] = [
   { value: "PUBLIC", label: "Public" },
@@ -14,6 +14,7 @@ const visibilityOptions: { value: PostVisibility; label: string }[] = [
 export function PostComposer() {
   const router = useRouter();
   const [body, setBody] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
   const [visibility, setVisibility] = useState<PostVisibility>("PUBLIC");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -22,7 +23,7 @@ export function PostComposer() {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-    const parsed = createPostSchema.safeParse({ body, visibility });
+    const parsed = createPostSchema.safeParse({ body, imageUrl, visibility });
     if (!parsed.success) {
       setError(parsed.error.issues[0]?.message ?? "Please check your input");
       return;
@@ -35,6 +36,7 @@ export function PostComposer() {
       return;
     }
     setBody("");
+    setImageUrl("");
     startTransition(() => router.refresh());
   }
 

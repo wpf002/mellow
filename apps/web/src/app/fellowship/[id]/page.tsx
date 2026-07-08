@@ -42,6 +42,14 @@ export default async function PostDetailPage({ params }: { params: Promise<{ id:
           </div>
 
           <p className="mt-4 text-[15px] whitespace-pre-wrap text-ink/90">{post.body}</p>
+          {post.imageUrl && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={post.imageUrl}
+              alt=""
+              className="mt-4 max-h-96 w-full rounded-xl border border-line object-cover"
+            />
+          )}
 
           <div className="mt-5">
             <ReactionBar postId={post.id} initial={post.reactions} disabled={!me} />

@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { conversationLabel } from "@mellow/shared";
 import { getConversations, getMe } from "@/lib/session";
 import { AppShell } from "@/components/AppShell";
 import { Avatar } from "@/components/Avatar";
-import { Card, cn } from "@/components/ui";
+import { Button, Card, cn } from "@/components/ui";
 
 export default async function MessagesPage() {
   const me = await getMe();
@@ -14,23 +15,29 @@ export default async function MessagesPage() {
 
   return (
     <AppShell me={me} pillar="fellowship" section="messages">
+      <div className="mb-4 flex justify-end">
+        <Link href="/messages/new">
+          <Button className="bg-fellowship hover:brightness-95">New Group</Button>
+        </Link>
+      </div>
+
       {conversations.length === 0 ? (
         <Card className="p-10 text-center">
           <h2 className="text-lg font-semibold">No messages yet</h2>
           <p className="mx-auto mt-2 max-w-md text-sm text-muted">
             Open a friend’s profile and tap <span className="font-medium">Message</span> to start a
-            conversation.
+            conversation, or create a <span className="font-medium">New Group</span> above.
           </p>
         </Card>
       ) : (
         <div className="space-y-2">
           {conversations.map((c) => {
-            const name = c.otherMember?.displayName ?? "Conversation";
+            const name = conversationLabel(c);
             const unread = c.unreadCount > 0;
             return (
               <Link key={c.id} href={`/messages/${c.id}`}>
                 <Card className={cn("flex items-center gap-3 p-4 transition hover:border-fellowship/50", unread && "border-fellowship/40")}>
-                  <Avatar name={name} src={c.otherMember?.avatarUrl} size={44} />
+                  <Avatar name={name} src={c.isGroup ? null : c.otherMember?.avatarUrl} size={44} />
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between gap-2">
                       <span className={cn("truncate", unread ? "font-bold" : "font-semibold")}>

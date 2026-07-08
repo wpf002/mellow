@@ -12,6 +12,7 @@ import type {
   JobType,
   MeUser,
   Message,
+  Notification,
   Page,
   Post,
   PostComment,
@@ -19,6 +20,7 @@ import type {
   Prayer,
   PublicUser,
   Reputation,
+  SearchResults,
   Streak,
   Talent,
 } from "@mellow/shared";
@@ -209,11 +211,39 @@ export async function getMyCourses(): Promise<{ enrolled: Course[]; teaching: Co
   return (await res.json()) as { enrolled: Course[]; teaching: Course[] };
 }
 
-/** Messages in a conversation (oldest-first) plus the other participant. */
+/** Messages in a conversation (oldest-first) plus participants + group metadata. */
 export async function getConversationMessages(
   id: string,
-): Promise<{ otherMember: PrayerAuthor | null; items: Message[] } | null> {
+): Promise<{
+  isGroup: boolean;
+  title: string | null;
+  members: PrayerAuthor[];
+  otherMember: PrayerAuthor | null;
+  items: Message[];
+} | null> {
   const res = await serverFetch(`/conversations/${encodeURIComponent(id)}/messages?limit=50`);
   if (!res.ok) return null;
-  return (await res.json()) as { otherMember: PrayerAuthor | null; items: Message[] };
+  return (await res.json()) as {
+    isGroup: boolean;
+    title: string | null;
+    members: PrayerAuthor[];
+    otherMember: PrayerAuthor | null;
+    items: Message[];
+  };
+}
+
+/** Global search across the four pillars (empty on blank/failed query). */
+export async function getSearchResults(q: string): Promise<SearchResults> {
+  const empty: SearchResults = { query: q, people: [], prayers: [], posts: [], jobs: [], courses: [] };
+  if (!q.trim()) return empty;
+  const res = await serverFetch(`/search?q=${encodeURIComponent(q)}`);
+  if (!res.ok) return empty;
+  return (await res.json()) as SearchResults;
+}
+
+/** The viewer's notifications (newest first) + unread count. */
+export async function getNotifications(): Promise<{ items: Notification[]; unreadCount: number }> {
+  const res = await serverFetch("/notifications?limit=40");
+  if (!res.ok) return { items: [], unreadCount: 0 };
+  return (await res.json()) as { items: Notification[]; unreadCount: number };
 }

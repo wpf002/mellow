@@ -7,7 +7,14 @@ import { prayerAuthorSchema } from "./prayer.js";
 // contact goes through the existing 1:1 messaging.
 // ---------------------------------------------------------------------------
 
-export const jobTypeSchema = z.enum(["FULL_TIME", "PART_TIME", "CONTRACT", "VOLUNTEER", "MISSION"]);
+export const jobTypeSchema = z.enum([
+  "FULL_TIME",
+  "PART_TIME",
+  "CONTRACT",
+  "VOLUNTEER",
+  "MISSION",
+  "PRAISE_TEAM",
+]);
 export type JobType = z.infer<typeof jobTypeSchema>;
 
 export const jobStatusSchema = z.enum(["OPEN", "CLOSED"]);
@@ -16,15 +23,17 @@ export type JobStatus = z.infer<typeof jobStatusSchema>;
 export const JOB_TYPE_LABEL: Record<JobType, string> = {
   FULL_TIME: "Full-time",
   PART_TIME: "Part-time",
-  CONTRACT: "Contract",
+  CONTRACT: "Freelance",
   VOLUNTEER: "Volunteer",
   MISSION: "Mission",
+  PRAISE_TEAM: "Praise Team",
 };
 
 export const createJobSchema = z.object({
   title: z.string().trim().min(3, "Title must be at least 3 characters").max(120),
   orgName: z.string().trim().max(80).optional().or(z.literal("")),
   description: z.string().trim().min(1, "Describe the opportunity").max(5000),
+  compensation: z.string().trim().max(80).optional().or(z.literal("")),
   location: z.string().trim().max(120).optional().or(z.literal("")),
   remote: z.boolean().default(false),
   type: jobTypeSchema.default("FULL_TIME"),
@@ -36,6 +45,7 @@ export const jobSchema = z.object({
   title: z.string(),
   orgName: z.string().nullable(),
   description: z.string(),
+  compensation: z.string().nullable(),
   location: z.string().nullable(),
   remote: z.boolean(),
   type: jobTypeSchema,
@@ -64,5 +74,8 @@ export const talentSchema = z.object({
   updatedAt: z.string(),
   user: prayerAuthorSchema,
   isViewer: z.boolean(),
+  // Derived reputation (off-chain, no monetary value) + viewer follow state.
+  reputationScore: z.number().int().nonnegative(),
+  isFollowedByViewer: z.boolean(),
 });
 export type Talent = z.infer<typeof talentSchema>;

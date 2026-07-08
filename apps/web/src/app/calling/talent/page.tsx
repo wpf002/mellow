@@ -4,6 +4,7 @@ import { AppShell } from "@/components/AppShell";
 import { Avatar } from "@/components/Avatar";
 import { Card } from "@/components/ui";
 import { MessageButton } from "@/components/MessageButton";
+import { FollowButton } from "@/components/FollowButton";
 import { TalentEditor } from "@/components/TalentEditor";
 
 export default async function TalentPage() {
@@ -32,17 +33,30 @@ export default async function TalentPage() {
               <div className="flex items-center gap-3">
                 <Avatar name={t.user.displayName} src={t.user.avatarUrl} size={40} />
                 <div className="min-w-0 flex-1">
-                  {t.user.handle ? (
-                    <Link href={`/${t.user.handle}`} className="font-semibold hover:underline">
-                      {t.user.displayName}
-                    </Link>
-                  ) : (
-                    <span className="font-semibold">{t.user.displayName}</span>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {t.user.handle ? (
+                      <Link href={`/${t.user.handle}`} className="font-semibold hover:underline">
+                        {t.user.displayName}
+                      </Link>
+                    ) : (
+                      <span className="font-semibold">{t.user.displayName}</span>
+                    )}
+                    <span
+                      className="shrink-0 rounded-full bg-prayer-soft px-2 py-0.5 text-xs font-semibold text-prayer"
+                      title="Reputation points — off-chain, no monetary value"
+                    >
+                      ⭐ {t.reputationScore}
+                    </span>
+                  </div>
                   <p className="truncate text-sm text-muted">{t.headline}</p>
                 </div>
-                {!t.isViewer && me && t.user.handle && <MessageButton handle={t.user.handle} />}
               </div>
+              {!t.isViewer && me && t.user.handle && (
+                <div className="mt-3 flex gap-2">
+                  <FollowButton handle={t.user.handle} initialFollowing={t.isFollowedByViewer} />
+                  <MessageButton handle={t.user.handle} />
+                </div>
+              )}
               {t.about && <p className="mt-3 line-clamp-3 text-sm text-ink/90">{t.about}</p>}
               {t.skills.length > 0 && (
                 <div className="mt-3 flex flex-wrap gap-1.5">

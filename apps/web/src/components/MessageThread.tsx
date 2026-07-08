@@ -9,9 +9,11 @@ import { formatDate } from "@/lib/format";
 export function MessageThread({
   conversationId,
   initialMessages,
+  isGroup = false,
 }: {
   conversationId: string;
   initialMessages: Message[];
+  isGroup?: boolean;
 }) {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [body, setBody] = useState("");
@@ -79,6 +81,11 @@ export function MessageThread({
                     : "rounded-bl-sm border border-line bg-surface",
                 )}
               >
+                {isGroup && !m.mine && (
+                  <span className="mb-0.5 block text-xs font-semibold text-fellowship">
+                    {m.sender.displayName}
+                  </span>
+                )}
                 {m.body}
                 <span
                   className={cn(

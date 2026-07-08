@@ -10,6 +10,32 @@ import {
   type Talent,
 } from "@mellow/shared";
 import { getUserId, requireUserId } from "../lib/session.js";
+import { WEIGHTS } from "../lib/reputation.js";
+
+/** Derived reputation scores for a set of users (one groupBy, no N+1). */
+async function reputationScores(userIds: string[]): Promise<Map<string, number>> {
+  const scores = new Map<string, number>(userIds.map((id) => [id, 0]));
+  if (userIds.length === 0) return scores;
+  const groups = await prisma.reputationEvent.groupBy({
+    by: ["userId", "category"],
+    where: { userId: { in: userIds } },
+    _count: { _all: true },
+  });
+  for (const g of groups) {
+    scores.set(g.userId, (scores.get(g.userId) ?? 0) + g._count._all * WEIGHTS[g.category]);
+  }
+  return scores;
+}
+
+/** Which of `userIds` the viewer follows (empty when signed out). */
+async function followedSet(viewerId: string | null, userIds: string[]): Promise<Set<string>> {
+  if (!viewerId || userIds.length === 0) return new Set();
+  const edges = await prisma.follow.findMany({
+    where: { followerId: viewerId, followingId: { in: userIds } },
+    select: { followingId: true },
+  });
+  return new Set(edges.map((e) => e.followingId));
+}
 
 // ---------------------------------------------------------------------------
 // Calling Center (Phase 7) — listings surface only. No transactions, fees,
@@ -37,6 +63,7 @@ function serializeJob(job: JobListing & { poster: User }, viewerId: string | nul
     description: job.description,
     location: job.location,
     remote: job.remote,
+    compensation: job.compensation,
     type: job.type,
     status: job.status,
     createdAt: job.createdAt.toISOString(),
@@ -45,7 +72,12 @@ function serializeJob(job: JobListing & { poster: User }, viewerId: string | nul
   };
 }
 
-function serializeTalent(profile: TalentProfile & { user: User }, viewerId: string | null): Talent {
+function serializeTalent(
+  profile: TalentProfile & { user: User },
+  viewerId: string | null,
+  reputationScore = 0,
+  isFollowedByViewer = false,
+): Talent {
   return {
     headline: profile.headline,
     about: profile.about,
@@ -55,7 +87,24 @@ function serializeTalent(profile: TalentProfile & { user: User }, viewerId: stri
     updatedAt: profile.updatedAt.toISOString(),
     user: toAuthor(profile.user),
     isViewer: viewerId === profile.userId,
+    reputationScore,
+    isFollowedByViewer,
   };
+}
+
+/** Serialize a page of talent entries with batched reputation + follow state. */
+async function serializeTalents(
+  profiles: (TalentProfile & { user: User })[],
+  viewerId: string | null,
+): Promise<Talent[]> {
+  const userIds = profiles.map((p) => p.userId);
+  const [scores, followed] = await Promise.all([
+    reputationScores(userIds),
+    followedSet(viewerId, userIds),
+  ]);
+  return profiles.map((p) =>
+    serializeTalent(p, viewerId, scores.get(p.userId) ?? 0, followed.has(p.userId)),
+  );
 }
 
 export async function registerCallingRoutes(app: FastifyInstance) {
@@ -68,7 +117,7 @@ export async function registerCallingRoutes(app: FastifyInstance) {
     if (!parsed.success) {
       return reply.code(400).send({ error: "Invalid input", details: parsed.error.flatten() });
     }
-    const { title, orgName, description, location, remote, type } = parsed.data;
+    const { title, orgName, description, location, remote, compensation, type } = parsed.data;
 
     const job = await prisma.jobListing.create({
       data: {
@@ -78,6 +127,7 @@ export async function registerCallingRoutes(app: FastifyInstance) {
         description,
         location: location && location.length > 0 ? location : null,
         remote,
+        compensation: compensation && compensation.length > 0 ? compensation : null,
         type,
       },
       include: { poster: true },
@@ -168,7 +218,7 @@ export async function registerCallingRoutes(app: FastifyInstance) {
       update: data,
       include: { user: true },
     });
-    return serializeTalent(profile, userId);
+    return (await serializeTalents([profile], userId))[0];
   });
 
   // The viewer's own entry (for prefilling the editor), or null.
@@ -179,7 +229,7 @@ export async function registerCallingRoutes(app: FastifyInstance) {
       where: { userId },
       include: { user: true },
     });
-    return profile ? serializeTalent(profile, userId) : { profile: null };
+    return profile ? (await serializeTalents([profile], userId))[0] : { profile: null };
   });
 
   // Talent directory (visible entries only, most recently updated first).
@@ -200,7 +250,7 @@ export async function registerCallingRoutes(app: FastifyInstance) {
     const hasMore = rows.length > limit;
     const page = hasMore ? rows.slice(0, limit) : rows;
     return {
-      items: page.map((p) => serializeTalent(p, viewerId)),
+      items: await serializeTalents(page, viewerId),
       nextCursor: hasMore ? page[page.length - 1]!.id : null,
     };
   });

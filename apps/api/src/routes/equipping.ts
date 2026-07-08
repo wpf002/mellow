@@ -9,6 +9,7 @@ import {
 } from "@mellow/shared";
 import { getUserId, requireUserId } from "../lib/session.js";
 import { serializeCourseDetail, serializeCourses } from "../lib/serializeCourse.js";
+import { notify } from "../lib/notifications.js";
 
 // ---------------------------------------------------------------------------
 // Equipping Center (Phase 8) — learning surface only. No creator payouts /
@@ -169,11 +170,13 @@ export async function registerEquippingRoutes(app: FastifyInstance) {
     const course = await prisma.course.findUnique({ where: { id: parsed.data.id } });
     if (!course || !course.published) return reply.code(404).send({ error: "Course not found" });
 
-    await prisma.enrollment.upsert({
+    const existing = await prisma.enrollment.findUnique({
       where: { courseId_userId: { courseId: course.id, userId } },
-      create: { courseId: course.id, userId },
-      update: {},
     });
+    if (!existing) {
+      await prisma.enrollment.create({ data: { courseId: course.id, userId } });
+      await notify(course.authorId, userId, "COURSE_ENROLLED", course.id); // first enroll only
+    }
     return loadDetail(course.id, userId);
   });
 

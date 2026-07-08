@@ -16,6 +16,7 @@ export function PrayerComposer({ companionEnabled = false }: { companionEnabled?
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
   const [visibility, setVisibility] = useState<PrayerVisibility>("PUBLIC");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -24,7 +25,7 @@ export function PrayerComposer({ companionEnabled = false }: { companionEnabled?
     e.preventDefault();
     setError(null);
 
-    const parsed = createPrayerSchema.safeParse({ title, body, visibility });
+    const parsed = createPrayerSchema.safeParse({ title, body, imageUrl, visibility });
     if (!parsed.success) {
       setError(parsed.error.issues[0]?.message ?? "Please check your input");
       return;
@@ -70,6 +71,23 @@ export function PrayerComposer({ companionEnabled = false }: { companionEnabled?
         </Field>
         {companionEnabled && (
           <CompanionAssist draft={body} onUseSuggestion={(text) => setBody(text)} />
+        )}
+
+        <Field label="Image URL" hint="Optional — link to an image to accompany your prayer.">
+          <Input
+            value={imageUrl}
+            onChange={(e) => setImageUrl(e.target.value)}
+            placeholder="https://…"
+            type="url"
+          />
+        </Field>
+        {imageUrl.trim() && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={imageUrl}
+            alt=""
+            className="max-h-56 w-full rounded-xl border border-line object-cover"
+          />
         )}
 
         <Field label="Who can see this" hint={activeHint}>

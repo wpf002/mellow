@@ -2,6 +2,8 @@ import Link from "next/link";
 import type { PublicUser } from "@mellow/shared";
 import type { Pillar } from "./PillarTabs";
 import { Avatar } from "./Avatar";
+import { SearchBox } from "./SearchBox";
+import { NotificationBell } from "./NotificationBell";
 import { Button, Card, cn } from "./ui";
 
 // ---------------------------------------------------------------------------
@@ -87,10 +89,7 @@ export function LeftNav({
         className,
       )}
     >
-      <div className="mb-2 hidden items-center gap-2 rounded-xl border border-line bg-white px-3 py-2 text-sm text-muted lg:flex">
-        <span aria-hidden>🔍</span>
-        <span>Search</span>
-      </div>
+      <SearchBox />
       {cfg.left.map((item) => (
         <Link
           key={item.key}
@@ -154,7 +153,7 @@ export function RightRail({
             {l.label}
           </Link>
         ))}
-        <p className="px-3 py-2 text-sm text-muted/60">Notifications · soon</p>
+        {me?.handle && <NotificationBell />}
       </Card>
     </aside>
   );

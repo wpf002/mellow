@@ -10,6 +10,13 @@ import { prayerAuthorSchema } from "./prayer.js";
 export const startConversationSchema = z.object({ handle: handleSchema });
 export type StartConversationInput = z.infer<typeof startConversationSchema>;
 
+/** Start a group chat with 2+ other users. */
+export const startGroupSchema = z.object({
+  title: z.string().trim().min(1, "Name the group").max(80),
+  handles: z.array(handleSchema).min(2, "Add at least two people").max(20),
+});
+export type StartGroupInput = z.infer<typeof startGroupSchema>;
+
 export const createMessageSchema = z.object({
   body: z.string().trim().min(1, "Write a message").max(2000),
 });
@@ -21,13 +28,17 @@ export const messageSchema = z.object({
   createdAt: z.string(),
   senderId: z.string(),
   mine: z.boolean(), // sent by the viewer
+  sender: prayerAuthorSchema, // shown on incoming bubbles in group chats
 });
 export type Message = z.infer<typeof messageSchema>;
 
 export const conversationSchema = z.object({
   id: z.string(),
   updatedAt: z.string(),
-  // The other participant (1:1). Null only in the degenerate self/empty case.
+  isGroup: z.boolean(),
+  title: z.string().nullable(), // group name; null for 1:1
+  // Other participants (all of them for groups; the single other for 1:1).
+  members: z.array(prayerAuthorSchema),
   otherMember: prayerAuthorSchema.nullable(),
   lastMessage: z
     .object({ body: z.string(), createdAt: z.string(), mine: z.boolean() })
@@ -35,3 +46,9 @@ export const conversationSchema = z.object({
   unreadCount: z.number().int().nonnegative(),
 });
 export type Conversation = z.infer<typeof conversationSchema>;
+
+/** The label to show for a conversation in a list. */
+export function conversationLabel(c: Conversation): string {
+  if (c.isGroup) return c.title ?? c.members.map((m) => m.displayName).join(", ");
+  return c.otherMember?.displayName ?? "Conversation";
+}

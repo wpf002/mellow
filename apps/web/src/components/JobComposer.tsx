@@ -12,6 +12,7 @@ export function JobComposer() {
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
   const [remote, setRemote] = useState(false);
+  const [compensation, setCompensation] = useState("");
   const [type, setType] = useState<JobType>("FULL_TIME");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -19,7 +20,15 @@ export function JobComposer() {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-    const parsed = createJobSchema.safeParse({ title, orgName, description, location, remote, type });
+    const parsed = createJobSchema.safeParse({
+      title,
+      orgName,
+      description,
+      location,
+      remote,
+      compensation,
+      type,
+    });
     if (!parsed.success) {
       setError(parsed.error.issues[0]?.message ?? "Please check your input");
       return;
@@ -65,6 +74,9 @@ export function JobComposer() {
             <Input value={location} onChange={(e) => setLocation(e.target.value)} maxLength={120} />
           </Field>
         </div>
+        <Field label="Compensation" hint="Optional — e.g. “$50–70k”, “Volunteer”, or “Stipend”.">
+          <Input value={compensation} onChange={(e) => setCompensation(e.target.value)} maxLength={120} placeholder="Volunteer / stipend / salary range" />
+        </Field>
         <label className="flex items-center gap-2 text-sm">
           <input type="checkbox" checked={remote} onChange={(e) => setRemote(e.target.checked)} />
           Remote-friendly

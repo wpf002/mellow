@@ -12,3 +12,5 @@ export * from "./message.js";
 export * from "./reputation.js";
 export * from "./calling.js";
 export * from "./equipping.js";
+export * from "./notification.js";
+export * from "./search.js";

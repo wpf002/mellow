@@ -46,6 +46,12 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
             </div>
           </div>
 
+          {job.compensation && (
+            <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-calling-soft px-3 py-1 text-sm font-semibold text-calling">
+              💰 {job.compensation}
+            </div>
+          )}
+
           <p className="mt-4 text-[15px] whitespace-pre-wrap text-ink/90">{job.description}</p>
 
           <div className="mt-6 flex items-center justify-between gap-4 border-t border-line pt-4">

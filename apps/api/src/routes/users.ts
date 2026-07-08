@@ -4,6 +4,7 @@ import { prisma } from "@mellow/db";
 import { handleSchema } from "@mellow/shared";
 import { getUserId, requireUserId } from "../lib/session.js";
 import { serializeUser } from "../lib/serialize.js";
+import { notify } from "../lib/notifications.js";
 
 const handleParams = z.object({ handle: handleSchema });
 
@@ -32,11 +33,13 @@ export async function registerUserRoutes(app: FastifyInstance) {
     if (!target) return reply.code(404).send({ error: "User not found" });
     if (target.id === viewerId) return reply.code(400).send({ error: "You cannot follow yourself" });
 
-    await prisma.follow.upsert({
+    const existing = await prisma.follow.findUnique({
       where: { followerId_followingId: { followerId: viewerId, followingId: target.id } },
-      create: { followerId: viewerId, followingId: target.id },
-      update: {},
     });
+    if (!existing) {
+      await prisma.follow.create({ data: { followerId: viewerId, followingId: target.id } });
+      await notify(target.id, viewerId, "FOLLOW"); // only on a new follow
+    }
     return { following: true };
   });
 

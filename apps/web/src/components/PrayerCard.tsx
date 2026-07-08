@@ -49,6 +49,14 @@ export function PrayerCard({ prayer, canPray }: { prayer: Prayer; canPray: boole
       <Link href={`/prayers/${prayer.id}`} className="mt-3 block">
         {prayer.title && <h3 className="font-semibold">{prayer.title}</h3>}
         <p className="mt-1 line-clamp-4 text-sm whitespace-pre-wrap text-ink/90">{prayer.body}</p>
+        {prayer.imageUrl && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={prayer.imageUrl}
+            alt=""
+            className="mt-3 max-h-80 w-full rounded-xl border border-line object-cover"
+          />
+        )}
       </Link>
 
       {answered && prayer.testimonial && (

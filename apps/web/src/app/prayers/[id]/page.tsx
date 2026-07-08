@@ -68,6 +68,14 @@ export default async function PrayerDetailPage({ params }: { params: Promise<{ i
 
           {prayer.title && <h1 className="mt-4 text-xl font-bold">{prayer.title}</h1>}
           <p className="mt-2 text-[15px] whitespace-pre-wrap text-ink/90">{prayer.body}</p>
+          {prayer.imageUrl && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={prayer.imageUrl}
+              alt=""
+              className="mt-4 max-h-96 w-full rounded-xl border border-line object-cover"
+            />
+          )}
 
           <div className="mt-5 flex items-center gap-4">
             <PrayButton

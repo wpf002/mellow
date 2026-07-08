@@ -72,6 +72,7 @@ export async function serializePrayers(
     id: p.id,
     title: p.title,
     body: p.body,
+    imageUrl: p.imageUrl,
     visibility: p.visibility,
     status: p.status,
     createdAt: p.createdAt.toISOString(),

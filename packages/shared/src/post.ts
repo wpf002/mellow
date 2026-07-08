@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { prayerAuthorSchema } from "./prayer.js";
+import { imageUrlSchema, prayerAuthorSchema } from "./prayer.js";
 
 // ---------------------------------------------------------------------------
 // Fellowship Feed (Phase 4). Posts are the fellowship-pillar content entity.
@@ -14,6 +14,7 @@ export type PostVisibility = z.infer<typeof postVisibilitySchema>;
 
 export const createPostSchema = z.object({
   body: z.string().trim().min(1, "Write something to share").max(2000),
+  imageUrl: imageUrlSchema.optional().or(z.literal("")),
   visibility: postVisibilitySchema.default("PUBLIC"),
 });
 export type CreatePostInput = z.infer<typeof createPostSchema>;
@@ -50,6 +51,7 @@ export type ReactionSummary = z.infer<typeof reactionSummarySchema>;
 export const postSchema = z.object({
   id: z.string(),
   body: z.string(),
+  imageUrl: z.string().nullable(),
   visibility: z.enum(["PUBLIC", "FRIENDS", "GROUP", "PRIVATE"]),
   createdAt: z.string(),
   author: prayerAuthorSchema,

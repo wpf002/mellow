@@ -11,6 +11,7 @@ import {
 import { getUserId, requireUserId } from "../lib/session.js";
 import { serializePrayer, serializePrayers } from "../lib/serializePrayer.js";
 import { emitReputation } from "../lib/reputation.js";
+import { notify } from "../lib/notifications.js";
 
 const idParams = z.object({ id: z.string().min(1) });
 const listQuery = cursorQuerySchema.extend({ author: handleSchema.optional() });
@@ -60,13 +61,14 @@ export async function registerPrayerRoutes(app: FastifyInstance) {
     if (!parsed.success) {
       return reply.code(400).send({ error: "Invalid input", details: parsed.error.flatten() });
     }
-    const { title, body, visibility } = parsed.data;
+    const { title, body, imageUrl, visibility } = parsed.data;
 
     const prayer = await prisma.prayer.create({
       data: {
         authorId: userId,
         title: title && title.length > 0 ? title : null,
         body,
+        imageUrl: imageUrl && imageUrl.length > 0 ? imageUrl : null,
         visibility,
       },
       include: prayerInclude,
@@ -173,6 +175,7 @@ export async function registerPrayerRoutes(app: FastifyInstance) {
 
     await prisma.prayerLog.create({ data: { prayerId: prayer.id, userId } });
     await emitReputation(userId, "INTERCESSION", prayer.id);
+    await notify(prayer.authorId, userId, "PRAYER_PRAYED", prayer.id);
 
     const refreshed = await prisma.prayer.findUnique({
       where: { id: prayer.id },
@@ -201,6 +204,7 @@ export async function registerPrayerRoutes(app: FastifyInstance) {
       include: { author: true },
     });
     await emitReputation(userId, "ENCOURAGEMENT", comment.id);
+    await notify(prayer.authorId, userId, "PRAYER_COMMENT", prayer.id);
     return reply.code(201).send({
       id: comment.id,
       body: comment.body,

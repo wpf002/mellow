@@ -47,6 +47,19 @@ enum JobType {
   CONTRACT
   VOLUNTEER
   MISSION
+  PRAISE_TEAM
+}
+
+// What a Notification is about. The recipient is the entity owner; the actor is
+// whoever triggered it (never notify your own actions).
+enum NotificationType {
+  FOLLOW // someone followed you
+  PRAYER_PRAYED // someone prayed for your prayer
+  PRAYER_COMMENT // someone commented on your prayer
+  PRAYER_ANSWERED // (reserved)
+  POST_REACTION // someone reacted to your post
+  POST_COMMENT // someone commented on your post
+  COURSE_ENROLLED // someone enrolled in your course
 }
 
 enum JobStatus {
@@ -141,7 +154,28 @@ model User {
   enrollments       Enrollment[]
   lessonCompletions LessonCompletion[]
 
+  // --- Notifications ---
+  notifications      Notification[] @relation("recipient")
+  notificationsMade  Notification[] @relation("actor")
+
   @@index([handle])
+}
+
+// Append-only notification feed. `entityId` points at the subject (prayer/post/
+// course id) for linking. Read state is per-notification.
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String // recipient
+  user      User             @relation("recipient", fields: [userId], references: [id], onDelete: Cascade)
+  actorId   String
+  actor     User             @relation("actor", fields: [actorId], references: [id], onDelete: Cascade)
+  type      NotificationType
+  entityId  String? // prayer/post/course id for deep-linking
+  read      Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  @@index([userId, read])
+  @@index([userId, createdAt])
 }
 
 model Session {
@@ -219,6 +253,7 @@ model Prayer {
   author     User         @relation(fields: [authorId], references: [id], onDelete: Cascade)
   title      String? // optional short heading
   body       String
+  imageUrl   String? // optional image (by URL)
   visibility Visibility   @default(PUBLIC)
   status     PrayerStatus @default(OPEN)
   createdAt  DateTime     @default(now())
@@ -367,6 +402,7 @@ model Post {
   authorId   String
   author     User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
   body       String
+  imageUrl   String? // optional image (by URL)
   visibility Visibility @default(PUBLIC)
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
@@ -407,6 +443,8 @@ model PostComment {
 // already supports groups.
 model Conversation {
   id        String   @id @default(cuid())
+  title     String? // set for group chats (3+ members); null for 1:1 DMs
+  isGroup   Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt // bumped on each new message for list ordering
 
@@ -503,6 +541,7 @@ model JobListing {
   title       String
   orgName     String? // church / ministry / company; optional for individuals
   description String
+  compensation String? // free text, e.g. "$62.5K–$85.1K/yr", "Volunteer", "Stipend"
   location    String? // free text; null when fully remote
   remote      Boolean   @default(false)
   type        JobType   @default(FULL_TIME)

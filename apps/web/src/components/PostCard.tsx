@@ -37,6 +37,14 @@ export function PostCard({ post, canReact }: { post: Post; canReact: boolean }) 
 
       <Link href={`/fellowship/${post.id}`} className="mt-3 block">
         <p className="text-[15px] whitespace-pre-wrap text-ink/90">{post.body}</p>
+        {post.imageUrl && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={post.imageUrl}
+            alt=""
+            className="mt-3 max-h-80 w-full rounded-xl border border-line object-cover"
+          />
+        )}
       </Link>
 
       <div className="mt-4 flex items-center justify-between gap-3">

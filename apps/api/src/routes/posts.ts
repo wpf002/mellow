@@ -12,6 +12,7 @@ import { getUserId, requireUserId } from "../lib/session.js";
 import { serializePost, serializePosts } from "../lib/serializePost.js";
 import { rankFeed } from "../lib/feedRanker.js";
 import { emitReputation } from "../lib/reputation.js";
+import { notify } from "../lib/notifications.js";
 
 const idParams = z.object({ id: z.string().min(1) });
 
@@ -51,7 +52,12 @@ export async function registerPostRoutes(app: FastifyInstance) {
       return reply.code(400).send({ error: "Invalid input", details: parsed.error.flatten() });
     }
     const post = await prisma.post.create({
-      data: { authorId: userId, body: parsed.data.body, visibility: parsed.data.visibility },
+      data: {
+        authorId: userId,
+        body: parsed.data.body,
+        imageUrl: parsed.data.imageUrl && parsed.data.imageUrl.length > 0 ? parsed.data.imageUrl : null,
+        visibility: parsed.data.visibility,
+      },
       include: { author: true },
     });
     await emitReputation(userId, "FELLOWSHIP", post.id);
@@ -154,6 +160,7 @@ export async function registerPostRoutes(app: FastifyInstance) {
       create: { postId: post.id, userId, type: parsedBody.data.type },
       update: { type: parsedBody.data.type },
     });
+    await notify(post.authorId, userId, "POST_REACTION", post.id);
     return serializePost(post, userId);
   });
 
@@ -190,6 +197,7 @@ export async function registerPostRoutes(app: FastifyInstance) {
       include: { author: true },
     });
     await emitReputation(userId, "ENCOURAGEMENT", comment.id);
+    await notify(post.authorId, userId, "POST_COMMENT", post.id);
     return reply.code(201).send({
       id: comment.id,
       body: comment.body,

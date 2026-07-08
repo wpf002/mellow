@@ -20,7 +20,13 @@ export function JobCard({ job }: { job: Job }) {
           </span>
         </div>
         <p className="mt-2 line-clamp-2 text-sm text-ink/90">{job.description}</p>
-        <p className="mt-3 text-xs text-muted">Posted {formatDate(job.createdAt)}</p>
+        <p className="mt-3 flex items-center gap-2 text-xs text-muted">
+          {job.compensation && (
+            <span className="font-medium text-ink/80">{job.compensation}</span>
+          )}
+          {job.compensation && <span aria-hidden>·</span>}
+          <span>Posted {formatDate(job.createdAt)}</span>
+        </p>
       </Card>
     </Link>
   );

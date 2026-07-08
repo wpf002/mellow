@@ -32,11 +32,15 @@ const testimonialBodySchema = z
   .min(1, "Share how this prayer was answered")
   .max(2000, "Testimonial must be at most 2000 characters");
 
+/** Optional image attached by URL (no upload backend yet). */
+export const imageUrlSchema = z.string().trim().url("Must be a valid image URL").max(2048);
+
 /** Compose a new prayer request. */
 export const createPrayerSchema = z.object({
   // Empty title collapses to undefined so the column stays null.
   title: titleSchema.optional().or(z.literal("")),
   body: prayerBodySchema,
+  imageUrl: imageUrlSchema.optional().or(z.literal("")),
   visibility: prayerVisibilitySchema.default("PUBLIC"),
 });
 export type CreatePrayerInput = z.infer<typeof createPrayerSchema>;
@@ -78,6 +82,7 @@ export const prayerSchema = z.object({
   id: z.string(),
   title: z.string().nullable(),
   body: z.string(),
+  imageUrl: z.string().nullable(),
   visibility: z.enum(["PUBLIC", "FRIENDS", "GROUP", "PRIVATE"]),
   status: prayerStatusSchema,
   createdAt: z.string(),

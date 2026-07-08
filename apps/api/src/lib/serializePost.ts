@@ -48,6 +48,7 @@ export async function serializePosts(
     return {
       id: p.id,
       body: p.body,
+      imageUrl: p.imageUrl,
       visibility: p.visibility,
       createdAt: p.createdAt.toISOString(),
       author: {

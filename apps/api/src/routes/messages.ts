@@ -1,7 +1,12 @@
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { prisma, type User } from "@mellow/db";
-import { createMessageSchema, cursorQuerySchema, startConversationSchema } from "@mellow/shared";
+import {
+  createMessageSchema,
+  cursorQuerySchema,
+  startConversationSchema,
+  startGroupSchema,
+} from "@mellow/shared";
 import { requireUserId } from "../lib/session.js";
 
 const idParams = z.object({ id: z.string().min(1) });
@@ -60,6 +65,9 @@ export async function registerMessageRoutes(app: FastifyInstance) {
         ]);
         return {
           id: m.conversationId,
+          isGroup: m.conversation.isGroup,
+          title: m.conversation.title,
+          members: m.conversation.members.map((mem) => toAuthor(mem.user)),
           updatedAt: m.conversation.updatedAt.toISOString(),
           otherMember: other ? toAuthor(other.user) : null,
           lastMessage: lastMessage
@@ -91,9 +99,10 @@ export async function registerMessageRoutes(app: FastifyInstance) {
       return reply.code(400).send({ error: "You cannot message yourself" });
     }
 
-    // Reuse an existing 1:1 that contains both users.
+    // Reuse an existing 1:1 (non-group) that contains both users.
     const existing = await prisma.conversation.findFirst({
       where: {
+        isGroup: false,
         AND: [
           { members: { some: { userId: viewerId } } },
           { members: { some: { userId: target.id } } },
@@ -112,6 +121,37 @@ export async function registerMessageRoutes(app: FastifyInstance) {
     return reply.code(existing ? 200 : 201).send({ id: conversation.id });
   });
 
+  // Start a group conversation with several members by handle.
+  app.post("/conversations/group", async (request, reply) => {
+    const viewerId = await requireUserId(request, reply);
+    if (!viewerId) return;
+
+    const parsed = startGroupSchema.safeParse(request.body);
+    if (!parsed.success) {
+      return reply.code(400).send({ error: "Invalid input", details: parsed.error.flatten() });
+    }
+
+    // Resolve handles → users; drop the creator if they listed themselves.
+    const handles = [...new Set(parsed.data.handles)];
+    const users = await prisma.user.findMany({ where: { handle: { in: handles } } });
+    if (users.length !== handles.length) {
+      return reply.code(404).send({ error: "One or more members not found" });
+    }
+    const memberIds = [...new Set([viewerId, ...users.map((u) => u.id)])];
+    if (memberIds.length < 3) {
+      return reply.code(400).send({ error: "A group needs at least two other members" });
+    }
+
+    const conversation = await prisma.conversation.create({
+      data: {
+        isGroup: true,
+        title: parsed.data.title,
+        members: { create: memberIds.map((userId) => ({ userId })) },
+      },
+    });
+    return reply.code(201).send({ id: conversation.id });
+  });
+
   // Messages in a conversation (latest window, ascending), member-gated.
   app.get("/conversations/:id/messages", async (request, reply) => {
     const viewerId = await requireUserId(request, reply);
@@ -128,6 +168,7 @@ export async function registerMessageRoutes(app: FastifyInstance) {
     // Newest `limit` messages, returned oldest-first for display.
     const rows = await prisma.message.findMany({
       where: { conversationId: parsedParams.data.id },
+      include: { sender: true },
       orderBy: { createdAt: "desc" },
       take: parsedQuery.data.limit,
     });
@@ -138,10 +179,14 @@ export async function registerMessageRoutes(app: FastifyInstance) {
         body: mmsg.body,
         createdAt: mmsg.createdAt.toISOString(),
         senderId: mmsg.senderId,
+        sender: toAuthor(mmsg.sender),
         mine: mmsg.senderId === viewerId,
       }));
 
     return {
+      isGroup: found.conversation.isGroup,
+      title: found.conversation.title,
+      members: found.conversation.members.map((m) => toAuthor(m.user)),
       otherMember: other ? toAuthor(other.user) : null,
       items,
     };
@@ -164,6 +209,7 @@ export async function registerMessageRoutes(app: FastifyInstance) {
     const message = await prisma.$transaction(async (tx) => {
       const created = await tx.message.create({
         data: { conversationId: parsedParams.data.id, senderId: viewerId, body: parsedBody.data.body },
+        include: { sender: true },
       });
       // Bump activity for list ordering; sender has implicitly read their own.
       await tx.conversation.update({
@@ -182,6 +228,7 @@ export async function registerMessageRoutes(app: FastifyInstance) {
       body: message.body,
       createdAt: message.createdAt.toISOString(),
       senderId: message.senderId,
+      sender: toAuthor(message.sender),
       mine: true,
     });
   });
