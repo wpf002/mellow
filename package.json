@@ -1,0 +1,21 @@
+{
+  "name": "mellow",
+  "private": true,
+  "packageManager": "pnpm@9.7.0",
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "db:generate": "pnpm --filter @mellow/db generate",
+    "db:migrate": "pnpm --filter @mellow/db migrate",
+    "db:studio": "pnpm --filter @mellow/db studio",
+    "db:seed": "pnpm --filter @mellow/db seed"
+  },
+  "devDependencies": {
+    "turbo": "^2.1.0",
+    "typescript": "^5.6.0",
+    "prettier": "^3.3.0",
+    "@types/node": "^22.0.0"
+  }
+}

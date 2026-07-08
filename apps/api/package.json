@@ -1,0 +1,21 @@
+{
+  "name": "@mellow/api",
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/server.js",
+    "lint": "echo \"(no lint configured for api yet)\"",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "fastify": "^5.0.0",
+    "@fastify/cors": "^10.0.0",
+    "@mellow/db": "workspace:*",
+    "@mellow/shared": "workspace:*",
+    "@mellow/ai": "workspace:*",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": { "tsx": "^4.19.0", "typescript": "^5.6.0", "@types/node": "^22.0.0" }
+}
