@@ -17,7 +17,7 @@ export default async function HomePage() {
   if (!me) {
     return (
       <div className="min-h-full">
-        <SiteHeader me={null} />
+        <SiteHeader me={null} showAuthActions={false} />
         <section className="mx-auto flex max-w-3xl flex-col items-center px-4 py-20 text-center">
           <div className="rounded-3xl bg-gradient-to-br from-prayer to-[#f0a58f] px-8 py-14 text-white shadow-sm">
             <p className="text-sm font-semibold tracking-wide uppercase opacity-90">Prayer Social</p>
@@ -30,7 +30,10 @@ export default async function HomePage() {
             </p>
             <div className="mt-8 flex justify-center gap-3">
               <Link href="/sign-up">
-                <Button className="bg-white text-prayer hover:bg-white/90">Get started</Button>
+                {/* Inline color so the coral text reliably wins over the base `text-white`. */}
+                <Button className="bg-white hover:bg-white/90" style={{ color: "var(--color-prayer)" }}>
+                  Get started
+                </Button>
               </Link>
               <Link href="/sign-in">
                 <Button variant="ghost" className="text-white hover:bg-white/15">

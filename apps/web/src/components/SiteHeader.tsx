@@ -5,7 +5,14 @@ import { Avatar } from "./Avatar";
 import { Button } from "./ui";
 import { SignOutButton } from "./SignOutButton";
 
-export function SiteHeader({ me }: { me: PublicUser | null }) {
+export function SiteHeader({
+  me,
+  showAuthActions = true,
+}: {
+  me: PublicUser | null;
+  /** Signed-out only: hide the Sign in / Sign up actions (e.g. the landing hero already has CTAs). */
+  showAuthActions?: boolean;
+}) {
   return (
     <header className="border-b border-line bg-surface/80 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
@@ -30,7 +37,7 @@ export function SiteHeader({ me }: { me: PublicUser | null }) {
               )}
               <SignOutButton />
             </>
-          ) : (
+          ) : showAuthActions ? (
             <>
               <Link href="/sign-in">
                 <Button variant="ghost">Sign in</Button>
@@ -39,7 +46,7 @@ export function SiteHeader({ me }: { me: PublicUser | null }) {
                 <Button>Sign up</Button>
               </Link>
             </>
-          )}
+          ) : null}
         </div>
       </div>
     </header>

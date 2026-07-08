@@ -94,23 +94,33 @@ export async function registerPostRoutes(app: FastifyInstance) {
     const ranked = rankFeed(page, { followingIds, nowMs: Date.now() });
     let items = await serializePosts(ranked, viewerId);
 
-    if (aiEnabled() && items.length > 1) {
+    // Only pay for the AI re-rank when there's enough to order (ranking a
+    // handful of posts via an LLM isn't worth the latency), and bound its tail
+    // with a timeout — either way v0 is the fallback.
+    const AI_RERANK_MIN_POSTS = 5;
+    const AI_RERANK_TIMEOUT_MS = 2500;
+    if (aiEnabled() && items.length >= AI_RERANK_MIN_POSTS) {
       try {
-        const orderedIds = await rankFeedAI(
-          items.map((p) => ({
-            id: p.id,
-            authorHandle: p.author.handle,
-            followed: followingIds.has(p.author.id),
-            body: p.body,
-            createdAt: p.createdAt,
-            reactions: p.reactions.total,
-            comments: p.commentCount,
-          })),
-        );
+        const orderedIds = await Promise.race([
+          rankFeedAI(
+            items.map((p) => ({
+              id: p.id,
+              authorHandle: p.author.handle,
+              followed: followingIds.has(p.author.id),
+              body: p.body,
+              createdAt: p.createdAt,
+              reactions: p.reactions.total,
+              comments: p.commentCount,
+            })),
+          ),
+          new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error("AI re-rank timed out")), AI_RERANK_TIMEOUT_MS),
+          ),
+        ]);
         const byId = new Map(items.map((p) => [p.id, p]));
         items = orderedIds.map((id) => byId.get(id)!);
       } catch (e) {
-        request.log.warn({ err: e }, "AI feed re-rank failed; serving v0 order");
+        request.log.warn({ err: e }, "AI feed re-rank skipped; serving v0 order");
       }
     }
 
