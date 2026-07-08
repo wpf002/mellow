@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getMe, getPrayer, getPrayerComments } from "@/lib/session";
+import { getCompanionEnabled, getMe, getPrayer, getPrayerComments } from "@/lib/session";
 import { AppShell } from "@/components/AppShell";
 import { Avatar } from "@/components/Avatar";
 import { Card } from "@/components/ui";
 import { PrayButton } from "@/components/PrayButton";
 import { CommentComposer } from "@/components/CommentComposer";
 import { AnswerPrayerForm } from "@/components/AnswerPrayerForm";
+import { ThreadSummaryButton } from "@/components/ThreadSummaryButton";
 import { formatDate } from "@/lib/format";
 
 const visibilityLabel: Record<string, string> = {
@@ -17,7 +18,11 @@ const visibilityLabel: Record<string, string> = {
 
 export default async function PrayerDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const [me, prayer] = await Promise.all([getMe(), getPrayer(id)]);
+  const [me, prayer, companionEnabled] = await Promise.all([
+    getMe(),
+    getPrayer(id),
+    getCompanionEnabled(),
+  ]);
   if (!prayer) notFound();
 
   const { items: comments } = await getPrayerComments(id);
@@ -93,6 +98,13 @@ export default async function PrayerDetailPage({ params }: { params: Promise<{ i
               <AnswerPrayerForm prayerId={prayer.id} />
             </Card>
           )
+        )}
+
+        {/* Companion thread summary (read-only; shown only when AI is enabled) */}
+        {me && companionEnabled && prayer.commentCount > 0 && (
+          <div className="mt-4">
+            <ThreadSummaryButton prayerId={prayer.id} />
+          </div>
         )}
 
         {/* Comments */}

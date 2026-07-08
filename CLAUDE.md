@@ -105,7 +105,22 @@ Better Auth is pinned to **`~1.2.12`** (the last zod-3 line) and `package.json` 
   Verified: fresh actions → score 8 (2+3+2+1 per weights) → 3/8 badges awarded once (idempotent
   re-eval) → browser day-mark emits FAITHFULNESS (8→11) → idempotent re-mark stays 11. **No
   backfill**: activity predating Phase 5 earns nothing (events are the source of truth).
-- **Next per plan: Phase 6** (AI Layer — Flint: Agape re-rank behind flag, Prayer Companion).
+- **Phase 6** (AI Layer — **Claude via the Anthropic SDK, not Flint**, per Will) — **built +
+  committed/pushed; flag-off path verified in browser, live AI calls pending an API key.**
+  `packages/ai` is the single Claude adapter (`@anthropic-ai/sdk`): `DEFAULT_MODEL` pinned in one
+  constant (`claude-opus-4-8`, override via `AI_DEFAULT_MODEL`), lazy client, `complete()` logs
+  **token usage on every call** (`ai_usage` JSON line), structured outputs via
+  `output_config.format` json_schema + adaptive thinking. **Feature flag** `aiEnabled()` = key
+  present && `AI_FEATURES` not off. Tasks in `packages/ai/src/tasks.ts`: `rankFeedAI` (Agape v1 —
+  re-ranks the chronological candidate window; permutation-guarded), `assistPrayer` + 
+  `summarizeThread` (Prayer Companion — **read-only, never posts**). API: `/feed` tries AI re-rank
+  when enabled and **always falls back to the pure v0 ranker** on flag-off or any error (verified
+  with a fake key: 200 + v0 order + warning log); `routes/companion.ts` → `/companion/status`,
+  `/companion/assist`, `/prayers/:id/summary` (auth-gated, visibility-checked, 503 when disabled,
+  502 on AI failure). Web: `CompanionAssist` panel in `PrayerComposer` ("use this wording" applies
+  to the draft — user posts, not the AI) + `ThreadSummaryButton` on prayer detail; both hidden when
+  `/companion/status` says disabled. **To activate:** set `ANTHROPIC_API_KEY` in `.env` (see
+  `.env.example`); restart API. All phases 0–6 complete; deferred backlog still needs Will's go.
 
 ### Dev env gotcha (Phase 4 — don't revert)
 `.claude/launch.json` pins **Node 24** for both `api` and `web` by prepending

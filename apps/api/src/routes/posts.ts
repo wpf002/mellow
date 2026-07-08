@@ -7,6 +7,7 @@ import {
   cursorQuerySchema,
   reactSchema,
 } from "@mellow/shared";
+import { aiEnabled, rankFeedAI } from "@mellow/ai";
 import { getUserId, requireUserId } from "../lib/session.js";
 import { serializePost, serializePosts } from "../lib/serializePost.js";
 import { rankFeed } from "../lib/feedRanker.js";
@@ -57,8 +58,10 @@ export async function registerPostRoutes(app: FastifyInstance) {
     return reply.code(201).send(await serializePost(post, userId));
   });
 
-  // The feed — Agape Algorithm v0. Chronological candidate window (cursor-
-  // paginated), reordered by the pure follow-graph ranker for display.
+  // The feed — Agape Algorithm. The candidate window is chronological and
+  // cursor-paginated; display order comes from the AI re-rank (v1) when the AI
+  // layer is enabled, always falling back to the pure follow-graph ranker (v0)
+  // when disabled or on any AI failure.
   app.get("/feed", async (request, reply) => {
     const parsed = cursorQuerySchema.safeParse(request.query);
     if (!parsed.success) return reply.code(400).send({ error: "Invalid query" });
@@ -86,9 +89,32 @@ export async function registerPostRoutes(app: FastifyInstance) {
       });
       followingIds = new Set(follows.map((f) => f.followingId));
     }
-    const ranked = rankFeed(page, { followingIds, nowMs: Date.now() });
 
-    return { items: await serializePosts(ranked, viewerId), nextCursor };
+    // v0 (pure, always computed) is both the fallback and the AI's baseline.
+    const ranked = rankFeed(page, { followingIds, nowMs: Date.now() });
+    let items = await serializePosts(ranked, viewerId);
+
+    if (aiEnabled() && items.length > 1) {
+      try {
+        const orderedIds = await rankFeedAI(
+          items.map((p) => ({
+            id: p.id,
+            authorHandle: p.author.handle,
+            followed: followingIds.has(p.author.id),
+            body: p.body,
+            createdAt: p.createdAt,
+            reactions: p.reactions.total,
+            comments: p.commentCount,
+          })),
+        );
+        const byId = new Map(items.map((p) => [p.id, p]));
+        items = orderedIds.map((id) => byId.get(id)!);
+      } catch (e) {
+        request.log.warn({ err: e }, "AI feed re-rank failed; serving v0 order");
+      }
+    }
+
+    return { items, nextCursor };
   });
 
   // Post detail.

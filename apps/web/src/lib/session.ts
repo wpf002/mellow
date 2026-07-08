@@ -87,6 +87,14 @@ export async function getGroupPrayers(id: string): Promise<Page<Prayer>> {
   return (await res.json()) as Page<Prayer>;
 }
 
+/** Whether the AI layer (Prayer Companion, Agape v1) is enabled server-side. */
+export async function getCompanionEnabled(): Promise<boolean> {
+  const res = await serverFetch("/companion/status");
+  if (!res.ok) return false;
+  const data = (await res.json()) as { enabled: boolean };
+  return data.enabled;
+}
+
 /** The signed-in user's prayer streak, or null. */
 export async function getStreak(): Promise<Streak | null> {
   const res = await serverFetch("/prayer-life/streak");

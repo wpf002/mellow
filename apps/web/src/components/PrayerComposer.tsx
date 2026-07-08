@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { createPrayerSchema, type Prayer, type PrayerVisibility } from "@mellow/shared";
 import { apiFetch } from "@/lib/api";
 import { Button, Card, Field, Input, Textarea } from "./ui";
+import { CompanionAssist } from "./CompanionAssist";
 
 const visibilityOptions: { value: PrayerVisibility; label: string; hint: string }[] = [
   { value: "PUBLIC", label: "Public", hint: "Anyone on Mellow can see and pray for this." },
@@ -11,7 +12,7 @@ const visibilityOptions: { value: PrayerVisibility; label: string; hint: string 
   { value: "PRIVATE", label: "Private", hint: "Only you can see this." },
 ];
 
-export function PrayerComposer() {
+export function PrayerComposer({ companionEnabled = false }: { companionEnabled?: boolean }) {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
@@ -67,6 +68,10 @@ export function PrayerComposer() {
             required
           />
         </Field>
+        {companionEnabled && (
+          <CompanionAssist draft={body} onUseSuggestion={(text) => setBody(text)} />
+        )}
+
         <Field label="Who can see this" hint={activeHint}>
           <select
             value={visibility}
