@@ -14,6 +14,21 @@ const nextConfig: NextConfig = {
       ".mjs": [".mts", ".mjs"],
     },
   },
+  // Same-origin proxy to the API service so the browser only ever talks to this
+  // origin and the auth cookie is first-party (fixes the cross-site cookie
+  // problem across split web/API domains). Better Auth lives at /api/auth on the
+  // API (keep the prefix); every other API route is served at the API root
+  // (strip the /api prefix). The auth rule must come first.
+  async rewrites() {
+    const api =
+      process.env.API_URL ?? process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+    return {
+      beforeFiles: [
+        { source: "/api/auth/:path*", destination: `${api}/api/auth/:path*` },
+        { source: "/api/:path*", destination: `${api}/:path*` },
+      ],
+    };
+  },
 };
 
 export default nextConfig;

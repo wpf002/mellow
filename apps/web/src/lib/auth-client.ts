@@ -1,8 +1,11 @@
 "use client";
 import { createAuthClient } from "better-auth/react";
-import { API_URL } from "./api";
 
-/** Better Auth talks to the handler mounted on the API (`/api/auth/*`). */
-export const authClient = createAuthClient({ baseURL: API_URL });
+/**
+ * Better Auth client. Talks to the handler same-origin at `/api/auth/*`, which
+ * Next rewrites to the API service — keeping the session cookie first-party so
+ * login persists (no cross-site cookie across split web/API domains).
+ */
+export const authClient = createAuthClient({ basePath: "/api/auth" });
 
 export const { signIn, signUp, signOut, useSession } = authClient;
