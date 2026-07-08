@@ -61,7 +61,7 @@ export function AnswerPrayerForm({ prayerId }: { prayerId: string }) {
           Cancel
         </Button>
         <Button type="submit" disabled={submitting}>
-          {submitting ? "Saving…" : "Post testimony"}
+          {submitting ? "Saving…" : "Post"}
         </Button>
       </div>
     </form>

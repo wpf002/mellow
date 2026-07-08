@@ -76,11 +76,11 @@ export function CourseView({ initial, signedIn }: { initial: CourseDetail; signe
               disabled={busy || course.lessonCount === 0}
               className="bg-equipping hover:brightness-95"
             >
-              {course.lessonCount === 0 ? "No lessons yet" : "Enroll — it's free"}
+              {course.lessonCount === 0 ? "No lessons yet" : "Enroll"}
             </Button>
           ) : (
             <Link href="/sign-in">
-              <Button variant="outline">Sign In to Enroll</Button>
+              <Button variant="outline">Login</Button>
             </Link>
           )}
         </div>
@@ -101,7 +101,7 @@ export function CourseView({ initial, signedIn }: { initial: CourseDetail; signe
               onClick={() => mutate(`/courses/${course.id}/publish`, { published: !course.published })}
               disabled={busy || (!course.published && course.lessonCount === 0)}
             >
-              {course.published ? "Unpublish" : "Publish course"}
+              {course.published ? "Unpublish" : "Publish"}
             </Button>
           </div>
           <AddLesson courseId={course.id} onDone={setCourse} />
@@ -150,7 +150,7 @@ export function CourseView({ initial, signedIn }: { initial: CourseDetail; signe
                             disabled={busy || lesson.completed}
                             className={lesson.completed ? "" : "bg-equipping hover:brightness-95"}
                           >
-                            {lesson.completed ? "✓ Completed" : "Mark complete"}
+                            {lesson.completed ? "Completed" : "Complete"}
                           </Button>
                         </div>
                       )}
@@ -234,7 +234,7 @@ function AddLesson({
           Cancel
         </Button>
         <Button type="submit" disabled={submitting} className="bg-equipping hover:brightness-95">
-          {submitting ? "Adding…" : "Add lesson"}
+          {submitting ? "Adding…" : "Add"}
         </Button>
       </div>
     </form>

@@ -40,10 +40,10 @@ export function SiteHeader({
           ) : showAuthActions ? (
             <>
               <Link href="/sign-in">
-                <Button variant="ghost">Sign In</Button>
+                <Button variant="ghost">Login</Button>
               </Link>
               <Link href="/sign-up">
-                <Button>Sign Up</Button>
+                <Button>Join</Button>
               </Link>
             </>
           ) : null}

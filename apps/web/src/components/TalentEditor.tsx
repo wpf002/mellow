@@ -45,7 +45,7 @@ export function TalentEditor({ initial }: { initial: Talent | null }) {
     return (
       <div className="mb-4 flex justify-end">
         <Button className="bg-calling hover:brightness-95" onClick={() => setOpen(true)}>
-          {initial ? "Edit my talent profile" : "Join the talent directory"}
+          {initial ? "Edit" : "Join"}
         </Button>
       </div>
     );
@@ -78,7 +78,7 @@ export function TalentEditor({ initial }: { initial: Talent | null }) {
             Cancel
           </Button>
           <Button type="submit" disabled={submitting} className="bg-calling hover:brightness-95">
-            {submitting ? "Saving…" : "Save profile"}
+            {submitting ? "Saving…" : "Save"}
           </Button>
         </div>
       </form>

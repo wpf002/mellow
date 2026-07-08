@@ -36,7 +36,7 @@ export function JoinGroupButton({
 
   return (
     <Button variant={isMember ? "outline" : "primary"} onClick={toggle} disabled={busy}>
-      {isMember ? "Leave group" : "Join group"}
+      {isMember ? "Leave" : "Join"}
     </Button>
   );
 }

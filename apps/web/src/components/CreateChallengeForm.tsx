@@ -72,7 +72,7 @@ export function CreateChallengeForm() {
             Cancel
           </Button>
           <Button type="submit" disabled={submitting}>
-            {submitting ? "Creating…" : "Create challenge"}
+            {submitting ? "Creating…" : "Create"}
           </Button>
         </div>
       </form>

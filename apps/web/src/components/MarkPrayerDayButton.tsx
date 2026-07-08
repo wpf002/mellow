@@ -31,7 +31,7 @@ export function MarkPrayerDayButton({ initialStreak }: { initialStreak: Streak }
         </span>
       </div>
       <Button onClick={mark} disabled={busy || streak.todayMarked}>
-        {streak.todayMarked ? "🙏 Marked today" : "Mark today’s prayer"}
+        {streak.todayMarked ? "Marked" : "Mark"}
       </Button>
     </div>
   );

@@ -29,7 +29,7 @@ export function JoinChallengeButton({
   if (joined) return <span className="text-sm font-semibold text-calling">✓ Joined</span>;
   return (
     <Button variant="outline" onClick={join} disabled={busy}>
-      Join challenge
+      Join
     </Button>
   );
 }

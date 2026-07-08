@@ -86,7 +86,7 @@ export function JobComposer() {
 
         <div className="flex justify-end">
           <Button type="submit" disabled={submitting} className="bg-calling hover:brightness-95">
-            {submitting ? "Posting…" : "Post opening"}
+            {submitting ? "Posting…" : "Post"}
           </Button>
         </div>
       </form>

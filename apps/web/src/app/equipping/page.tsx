@@ -44,7 +44,7 @@ export default async function EquippingPage({
         </div>
         {me && (
           <Link href="/equipping/new" className="shrink-0">
-            <Button className="bg-equipping hover:brightness-95">Teach a course</Button>
+            <Button className="bg-equipping hover:brightness-95">Teach</Button>
           </Link>
         )}
       </div>

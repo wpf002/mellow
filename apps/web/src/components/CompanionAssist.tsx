@@ -54,7 +54,7 @@ export function CompanionAssist({
           disabled={busy}
           className={cn("border-equipping text-ink hover:bg-equipping-soft/60")}
         >
-          {busy ? "Thinking…" : assist ? "Ask again" : "Help me phrase this"}
+          {busy ? "Thinking…" : assist ? "Retry" : "Suggest"}
         </Button>
       </div>
       <p className="mt-1 text-xs text-muted">
@@ -73,7 +73,7 @@ export function CompanionAssist({
                 className="px-3 py-1 text-xs"
                 onClick={() => onUseSuggestion(assist.suggestion)}
               >
-                Use this wording
+                Use
               </Button>
             </div>
           </div>

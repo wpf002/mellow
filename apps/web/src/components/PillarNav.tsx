@@ -106,7 +106,7 @@ export function LeftNav({
   );
 }
 
-/** Right utility rail: the "My Profile" card + contextual quick links. */
+/** Right utility rail: the "Profile" card + contextual quick links. */
 export function RightRail({
   pillar,
   me,
@@ -130,7 +130,7 @@ export function RightRail({
           </div>
           <Link href={`/${me.handle}`} className="mt-3 block">
             <Button variant="outline" className="w-full">
-              My Profile
+              Profile
             </Button>
           </Link>
         </Card>
@@ -138,7 +138,7 @@ export function RightRail({
         <Card className="p-4 text-center">
           <p className="text-sm text-muted">Sign in to personalize Mellow.</p>
           <Link href="/sign-in" className="mt-3 block">
-            <Button className="w-full">Sign In</Button>
+            <Button className="w-full">Login</Button>
           </Link>
         </Card>
       )}

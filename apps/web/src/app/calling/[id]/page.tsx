@@ -76,7 +76,7 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
                   <MessageButton handle={job.poster.handle} />
                 ) : (
                   <Link href="/sign-in">
-                    <Button variant="outline">Sign In to Reach Out</Button>
+                    <Button variant="outline">Login</Button>
                   </Link>
                 ))}
             </div>

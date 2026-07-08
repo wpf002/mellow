@@ -17,7 +17,7 @@ export default async function MessagesPage() {
     <AppShell me={me} pillar="fellowship" section="messages">
       <div className="mb-4 flex justify-end">
         <Link href="/messages/new">
-          <Button className="bg-fellowship hover:brightness-95">New Group</Button>
+          <Button className="bg-fellowship hover:brightness-95">Group</Button>
         </Link>
       </div>
 

@@ -21,7 +21,7 @@ export function CloseJobButton({ jobId }: { jobId: string }) {
 
   return (
     <Button variant="outline" onClick={close} disabled={busy}>
-      {busy ? "Closing…" : "Mark as filled / close"}
+      {busy ? "Closing…" : "Close"}
     </Button>
   );
 }

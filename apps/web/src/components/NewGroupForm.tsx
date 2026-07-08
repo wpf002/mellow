@@ -63,7 +63,7 @@ export function NewGroupForm() {
 
         <div className="flex justify-end">
           <Button type="submit" disabled={submitting} className="bg-fellowship hover:brightness-95">
-            {submitting ? "Creating…" : "Start group"}
+            {submitting ? "Creating…" : "Start"}
           </Button>
         </div>
       </form>

@@ -64,7 +64,7 @@ export function ProfileForm({ me }: { me: MeUser }) {
         {error && <p className="text-sm text-brand">{error}</p>}
         <div className="flex items-center gap-3">
           <Button type="submit" disabled={status === "saving"}>
-            {status === "saving" ? "Saving…" : "Save changes"}
+            {status === "saving" ? "Saving…" : "Save"}
           </Button>
           {status === "saved" && <span className="text-sm text-calling">Saved ✓</span>}
         </div>

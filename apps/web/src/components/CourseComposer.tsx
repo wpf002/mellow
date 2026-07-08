@@ -59,7 +59,7 @@ export function CourseComposer() {
 
         <div className="flex justify-end">
           <Button type="submit" disabled={submitting} className="bg-equipping hover:brightness-95">
-            {submitting ? "Creating…" : "Create course"}
+            {submitting ? "Creating…" : "Create"}
           </Button>
         </div>
         <p className="text-xs text-muted">

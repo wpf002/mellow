@@ -108,7 +108,7 @@ export function PrayerComposer({ companionEnabled = false }: { companionEnabled?
 
         <div className="flex justify-end">
           <Button type="submit" disabled={submitting}>
-            {submitting ? "Posting…" : "Post prayer"}
+            {submitting ? "Posting…" : "Post"}
           </Button>
         </div>
       </form>

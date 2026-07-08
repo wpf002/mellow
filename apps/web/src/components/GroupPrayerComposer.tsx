@@ -55,7 +55,7 @@ export function GroupPrayerComposer({ groupId }: { groupId: string }) {
         {error && <p className="text-sm text-brand">{error}</p>}
         <div className="flex justify-end">
           <Button type="submit" disabled={submitting}>
-            {submitting ? "Posting…" : "Post to group"}
+            {submitting ? "Posting…" : "Post"}
           </Button>
         </div>
       </form>

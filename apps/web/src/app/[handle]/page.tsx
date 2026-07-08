@@ -40,7 +40,7 @@ export default async function ProfilePage({ params }: { params: Promise<{ handle
             <div className="shrink-0">
               {profile.isViewer ? (
                 <Link href="/settings/profile">
-                  <Button variant="outline">Edit Profile</Button>
+                  <Button variant="outline">Edit</Button>
                 </Link>
               ) : me ? (
                 <div className="flex gap-2">

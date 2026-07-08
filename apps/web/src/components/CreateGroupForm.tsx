@@ -35,7 +35,7 @@ export function CreateGroupForm() {
   if (!open) {
     return (
       <div className="mb-4 flex justify-end">
-        <Button onClick={() => setOpen(true)}>New group</Button>
+        <Button onClick={() => setOpen(true)}>Create</Button>
       </div>
     );
   }
@@ -55,7 +55,7 @@ export function CreateGroupForm() {
             Cancel
           </Button>
           <Button type="submit" disabled={submitting}>
-            {submitting ? "Creating…" : "Create group"}
+            {submitting ? "Creating…" : "Create"}
           </Button>
         </div>
       </form>

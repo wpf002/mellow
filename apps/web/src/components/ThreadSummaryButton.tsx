@@ -32,7 +32,7 @@ export function ThreadSummaryButton({ prayerId }: { prayerId: string }) {
         </div>
       ) : (
         <Button type="button" variant="ghost" onClick={summarize} disabled={busy} className="text-sm">
-          {busy ? "Summarizing…" : "✨ Summarize this thread"}
+          {busy ? "Summarizing…" : "Summarize"}
         </Button>
       )}
       {error && <p className="mt-1 text-sm text-brand">{error}</p>}
