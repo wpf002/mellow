@@ -2,7 +2,6 @@ import Link from "next/link";
 import { JOB_TYPE_LABEL, jobTypeSchema, type JobType } from "@mellow/shared";
 import { getJobs, getMe } from "@/lib/session";
 import { AppShell } from "@/components/AppShell";
-import { CallingSubnav } from "@/components/CallingSubnav";
 import { JobCard } from "@/components/JobCard";
 import { Button, Card, cn } from "@/components/ui";
 
@@ -18,9 +17,7 @@ export default async function CallingPage({
   const [me, { items: jobs }] = await Promise.all([getMe(), getJobs(type)]);
 
   return (
-    <AppShell me={me} pillar="calling">
-      <CallingSubnav active="openings" />
-
+    <AppShell me={me} pillar="calling" section="openings">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap gap-2">
           <Link

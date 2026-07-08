@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation";
 import { getFeed, getMe } from "@/lib/session";
 import { AppShell } from "@/components/AppShell";
-import { FellowshipSubnav } from "@/components/FellowshipSubnav";
 import { PostComposer } from "@/components/PostComposer";
 import { PostCard } from "@/components/PostCard";
 import { Card } from "@/components/ui";
@@ -14,8 +13,7 @@ export default async function FellowshipPage() {
   const { items: posts } = await getFeed();
 
   return (
-    <AppShell me={me} pillar="fellowship">
-      <FellowshipSubnav active="feed" />
+    <AppShell me={me} pillar="fellowship" section="feed">
       <PostComposer />
 
       {posts.length === 0 ? (

@@ -2,7 +2,6 @@ import Link from "next/link";
 import { COURSE_CATEGORY_LABEL, courseCategorySchema, type CourseCategory } from "@mellow/shared";
 import { getCourses, getMe } from "@/lib/session";
 import { AppShell } from "@/components/AppShell";
-import { EquippingSubnav } from "@/components/EquippingSubnav";
 import { CourseCard } from "@/components/CourseCard";
 import { Button, Card, cn } from "@/components/ui";
 
@@ -18,9 +17,7 @@ export default async function EquippingPage({
   const [me, { items: courses }] = await Promise.all([getMe(), getCourses(category)]);
 
   return (
-    <AppShell me={me} pillar="equipping">
-      <EquippingSubnav active="courses" />
-
+    <AppShell me={me} pillar="equipping" section="courses">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap gap-2">
           <Link

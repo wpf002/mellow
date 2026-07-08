@@ -2,7 +2,6 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getMe } from "@/lib/session";
 import { AppShell } from "@/components/AppShell";
-import { EquippingSubnav } from "@/components/EquippingSubnav";
 import { CourseComposer } from "@/components/CourseComposer";
 
 export default async function NewCoursePage() {
@@ -11,8 +10,7 @@ export default async function NewCoursePage() {
   if (!me.handle) redirect("/onboarding");
 
   return (
-    <AppShell me={me} pillar="equipping">
-      <EquippingSubnav active="courses" />
+    <AppShell me={me} pillar="equipping" section="courses">
       <div className="mx-auto max-w-2xl">
         <Link href="/equipping" className="text-sm text-muted hover:underline">
           ← All Courses

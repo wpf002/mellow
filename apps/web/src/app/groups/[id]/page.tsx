@@ -2,7 +2,6 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getGroup, getGroupPrayers, getMe } from "@/lib/session";
 import { AppShell } from "@/components/AppShell";
-import { PrayerSubnav } from "@/components/PrayerSubnav";
 import { JoinGroupButton } from "@/components/JoinGroupButton";
 import { GroupPrayerComposer } from "@/components/GroupPrayerComposer";
 import { PrayerCard } from "@/components/PrayerCard";
@@ -21,8 +20,7 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
   const { items: prayers } = isMember ? await getGroupPrayers(id) : { items: [] };
 
   return (
-    <AppShell me={me} pillar="prayer">
-      <PrayerSubnav active="groups" />
+    <AppShell me={me} pillar="prayer" section="groups">
       <Link href="/groups" className="text-sm text-muted hover:underline">
         ← All Groups
       </Link>

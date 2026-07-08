@@ -18,7 +18,7 @@ export default async function ConversationPage({ params }: { params: Promise<{ i
   const name = data.otherMember?.displayName ?? "Conversation";
 
   return (
-    <AppShell me={me} pillar="fellowship">
+    <AppShell me={me} pillar="fellowship" section="messages">
       <div className="mx-auto max-w-2xl">
         <Link href="/messages" className="text-sm text-muted hover:underline">
           ← All Messages

@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import { JOB_TYPE_LABEL } from "@mellow/shared";
 import { getJob, getMe } from "@/lib/session";
 import { AppShell } from "@/components/AppShell";
-import { CallingSubnav } from "@/components/CallingSubnav";
 import { Avatar } from "@/components/Avatar";
 import { Button, Card } from "@/components/ui";
 import { MessageButton } from "@/components/MessageButton";
@@ -18,8 +17,7 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
   const closed = job.status === "CLOSED";
 
   return (
-    <AppShell me={me} pillar="calling">
-      <CallingSubnav active="openings" />
+    <AppShell me={me} pillar="calling" section="openings">
       <div className="mx-auto max-w-2xl">
         <Link href="/calling" className="text-sm text-muted hover:underline">
           ← All Openings

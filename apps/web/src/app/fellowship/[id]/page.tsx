@@ -2,7 +2,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getMe, getPost, getPostComments } from "@/lib/session";
 import { AppShell } from "@/components/AppShell";
-import { FellowshipSubnav } from "@/components/FellowshipSubnav";
 import { Avatar } from "@/components/Avatar";
 import { Card } from "@/components/ui";
 import { ReactionBar } from "@/components/ReactionBar";
@@ -18,8 +17,7 @@ export default async function PostDetailPage({ params }: { params: Promise<{ id:
   const { author } = post;
 
   return (
-    <AppShell me={me} pillar="fellowship">
-      <FellowshipSubnav active="feed" />
+    <AppShell me={me} pillar="fellowship" section="feed">
       <div className="mx-auto max-w-2xl">
         <Link href="/fellowship" className="text-sm text-muted hover:underline">
           ← Back to feed

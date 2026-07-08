@@ -2,7 +2,6 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getMe } from "@/lib/session";
 import { AppShell } from "@/components/AppShell";
-import { CallingSubnav } from "@/components/CallingSubnav";
 import { JobComposer } from "@/components/JobComposer";
 
 export default async function NewJobPage() {
@@ -11,8 +10,7 @@ export default async function NewJobPage() {
   if (!me.handle) redirect("/onboarding");
 
   return (
-    <AppShell me={me} pillar="calling">
-      <CallingSubnav active="openings" />
+    <AppShell me={me} pillar="calling" section="openings">
       <div className="mx-auto max-w-2xl">
         <Link href="/calling" className="text-sm text-muted hover:underline">
           ← All Openings

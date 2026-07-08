@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation";
 import { getChallenges, getMe, getStreak } from "@/lib/session";
 import { AppShell } from "@/components/AppShell";
-import { PrayerSubnav } from "@/components/PrayerSubnav";
 import { MarkPrayerDayButton } from "@/components/MarkPrayerDayButton";
 import { StreakCalendar } from "@/components/StreakCalendar";
 import { CreateChallengeForm } from "@/components/CreateChallengeForm";
@@ -19,9 +18,7 @@ export default async function PrayerLifePage() {
   const streakData = streak ?? { current: 0, longest: 0, todayMarked: false, markedDates: [] };
 
   return (
-    <AppShell me={me} pillar="prayer">
-      <PrayerSubnav active="life" />
-
+    <AppShell me={me} pillar="prayer" section="life">
       <Card className="p-6">
         <h1 className="text-lg font-semibold">Your Prayer Life</h1>
         <p className="mt-1 text-sm text-muted">

@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { getMe, getMyTalent, getTalent } from "@/lib/session";
 import { AppShell } from "@/components/AppShell";
-import { CallingSubnav } from "@/components/CallingSubnav";
 import { Avatar } from "@/components/Avatar";
 import { Card } from "@/components/ui";
 import { MessageButton } from "@/components/MessageButton";
@@ -15,9 +14,7 @@ export default async function TalentPage() {
   ]);
 
   return (
-    <AppShell me={me} pillar="calling">
-      <CallingSubnav active="talent" />
-
+    <AppShell me={me} pillar="calling" section="talent">
       {me && <TalentEditor initial={mine} />}
 
       {talent.length === 0 ? (

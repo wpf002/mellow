@@ -2,7 +2,6 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getMe, getMyCourses } from "@/lib/session";
 import { AppShell } from "@/components/AppShell";
-import { EquippingSubnav } from "@/components/EquippingSubnav";
 import { CourseCard } from "@/components/CourseCard";
 import { Button, Card } from "@/components/ui";
 
@@ -14,9 +13,7 @@ export default async function MyLearningPage() {
   const { enrolled, teaching } = await getMyCourses();
 
   return (
-    <AppShell me={me} pillar="equipping">
-      <EquippingSubnav active="learning" />
-
+    <AppShell me={me} pillar="equipping" section="learning">
       <section>
         <h2 className="mb-3 px-1 text-sm font-semibold text-muted">Enrolled</h2>
         {enrolled.length === 0 ? (

@@ -178,6 +178,16 @@ every request including bodyless POSTs (follow, `/pray`, group join/leave, `/pra
 Fastify's default parser 400s those with `FST_ERR_CTP_EMPTY_JSON_BODY`. This was latent through
 Phases 1–2 (those POSTs were only ever curl-tested without the header).
 
+## App layout (deck-aligned — 3-column)
+`AppShell` renders the deck's 3-column app frame: pillar tabs on top, then **left filter nav ·
+center content · right utility rail**. Left nav + right rail configs live per-pillar in
+`components/PillarNav.tsx` (`PILLAR_NAV`); pages pass `pillar` + `section` to `AppShell` (no more
+per-pillar `*Subnav` components — those were removed). Right rail = the "My Eternal Profile" card
+(profile link, per the deck; web3 identity still deferred) + contextual quick links. Rails collapse
+on mobile (left nav becomes a horizontal scroller; right rail hides). Deck items still not built:
+search (decorative box only), notifications ("soon"), Translate/Translator AI, Job Match AI,
+credentials/verification, post media, group chat — see the deck audit; core flows all work.
+
 ## Web bundler note (Phase 1 fix — don't revert)
 `apps/web` builds with **Webpack**, not Turbopack (`dev`/`build` use `--webpack`; `next.config.ts`
 sets `experimental.extensionAlias` `.js`→`.ts`). Reason: the `@mellow/shared`/`@mellow/ui` barrels

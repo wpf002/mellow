@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation";
 import { getGroups, getMe } from "@/lib/session";
 import { AppShell } from "@/components/AppShell";
-import { PrayerSubnav } from "@/components/PrayerSubnav";
 import { CreateGroupForm } from "@/components/CreateGroupForm";
 import { GroupCard } from "@/components/GroupCard";
 import { Card } from "@/components/ui";
@@ -14,8 +13,7 @@ export default async function GroupsPage() {
   const { items: groups } = await getGroups();
 
   return (
-    <AppShell me={me} pillar="prayer">
-      <PrayerSubnav active="groups" />
+    <AppShell me={me} pillar="prayer" section="groups">
       <CreateGroupForm />
 
       {groups.length === 0 ? (

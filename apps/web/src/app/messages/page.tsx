@@ -2,7 +2,6 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getConversations, getMe } from "@/lib/session";
 import { AppShell } from "@/components/AppShell";
-import { FellowshipSubnav } from "@/components/FellowshipSubnav";
 import { Avatar } from "@/components/Avatar";
 import { Card, cn } from "@/components/ui";
 
@@ -14,9 +13,7 @@ export default async function MessagesPage() {
   const { items: conversations } = await getConversations();
 
   return (
-    <AppShell me={me} pillar="fellowship">
-      <FellowshipSubnav active="messages" />
-
+    <AppShell me={me} pillar="fellowship" section="messages">
       {conversations.length === 0 ? (
         <Card className="p-10 text-center">
           <h2 className="text-lg font-semibold">No messages yet</h2>
