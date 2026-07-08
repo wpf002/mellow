@@ -51,10 +51,29 @@ Better Auth is pinned to **`~1.2.12`** (the last zod-3 line) and `package.json` 
 ## Status
 - **Phase 0** (bootstrap) — done, pushed.
 - **Phase 1** (auth / users / profiles) — built + committed + pushed. Verified end-to-end at the
-  **API** level via curl (sign up → onboarding → profile → follow/unfollow, auth gate 401, handle
-  immutability 409). **Pending:** confirm the web UI renders in a browser (`pnpm dev`, walk the flow).
-- **Next: Phase 2** — Prayer Social core (Prayer, PrayerLog append-only, Comment, Testimonial;
-  wall, compose, detail, "I prayed", answered + testimonial). Derived prayer counts.
+  **API** level via curl AND now in a **browser** (sign up → onboarding → profile at `/[handle]`,
+  follow counts, `/me` gate via redirect).
+- **Phase 2** (Prayer Social core) — **built + verified in browser, not yet committed.** Models
+  `Prayer` / `PrayerLog` (append-only) / `Comment` / `Testimonial` + `PrayerStatus` enum (migration
+  `phase2_prayer_social`). API routes in `apps/api/src/routes/prayers.ts` (create, wall + profile
+  list cursor-paginated & visibility-filtered, detail, `/pray`, comments, `/answer`) with a batch
+  serializer (`lib/serializePrayer.ts`) that derives `uniquePrayed`/`totalPrayed`/`commentCount` —
+  never stored. Shared schemas in `packages/shared/src/prayer.ts`. Web: `/` wall, `/prayers/new`,
+  `/prayers/[id]`, profile prayers tab (`PrayerCard`, `PrayButton`, composers, `AnswerPrayerForm`).
+  Verified: create → wall → 2nd user prays (unique vs total) + comments → author answers w/
+  testimonial → answered state renders; PUBLIC/PRIVATE/FRIENDS(mutual-follow) visibility; 401/403/409
+  guards. Visibility rule: `FRIENDS` = **mutual follow**; `GROUP` deferred to Phase 3 (author-only
+  for now); compose offers PUBLIC/FRIENDS/PRIVATE.
+- **Next: Phase 3** — Group Prayer + Prayer Life (groups, `PrayerDayMark` streaks, challenges).
+
+## Web bundler note (Phase 1 fix — don't revert)
+`apps/web` builds with **Webpack**, not Turbopack (`dev`/`build` use `--webpack`; `next.config.ts`
+sets `experimental.extensionAlias` `.js`→`.ts`). Reason: the `@mellow/shared`/`@mellow/ui` barrels
+re-export with `.js` extensions (required so the NodeNext **API** typechecks the same source), and
+Turbopack does not substitute `.js`→`.ts` inside symlinked workspace packages — every page importing
+the shared barrel 500s with "Can't resolve './pagination.js'". Webpack's `extensionAlias` fixes it.
+Also: `.claude/launch.json` wraps the web `dev` in `sh -c "ulimit -n 10240; …"` because the macOS GUI
+fd limit (256) makes the dev server throw `EMFILE: too many open files` and 404 every route.
 
 ## Guardrail
 Work only in this repo. Do not touch or push to any other repo (e.g. crossbar). Commits/pushes go to

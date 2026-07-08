@@ -1,16 +1,18 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getMe, getProfile } from "@/lib/session";
+import { getMe, getPrayers, getProfile } from "@/lib/session";
 import { AppShell } from "@/components/AppShell";
 import { Avatar } from "@/components/Avatar";
 import { Button, Card } from "@/components/ui";
 import { FollowButton } from "@/components/FollowButton";
+import { PrayerCard } from "@/components/PrayerCard";
 
 export default async function ProfilePage({ params }: { params: Promise<{ handle: string }> }) {
   const { handle } = await params;
   const [me, profile] = await Promise.all([getMe(), getProfile(handle)]);
   if (!profile) notFound();
 
+  const { items: prayers } = await getPrayers({ author: handle, limit: 30 });
   const name = profile.displayName ?? `@${profile.handle}`;
 
   return (
@@ -52,13 +54,22 @@ export default async function ProfilePage({ params }: { params: Promise<{ handle
         </div>
       </Card>
 
-      <Card className="mt-4 p-6">
-        <h2 className="text-sm font-semibold text-muted">Prayers</h2>
-        <p className="mt-2 text-sm text-muted">
-          {profile.isViewer ? "Your" : `${name}’s`} prayer requests and answered-prayer testimonials
-          will appear here in Phase 2.
-        </p>
-      </Card>
+      <div className="mt-4">
+        <h2 className="mb-3 px-1 text-sm font-semibold text-muted">Prayers</h2>
+        {prayers.length === 0 ? (
+          <Card className="p-6">
+            <p className="text-sm text-muted">
+              {profile.isViewer ? "You haven’t" : `${name} hasn’t`} shared any prayer requests yet.
+            </p>
+          </Card>
+        ) : (
+          <div className="space-y-4">
+            {prayers.map((prayer) => (
+              <PrayerCard key={prayer.id} prayer={prayer} canPray={Boolean(me)} />
+            ))}
+          </div>
+        )}
+      </div>
     </AppShell>
   );
 }

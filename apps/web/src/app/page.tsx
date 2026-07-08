@@ -1,9 +1,10 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { getMe } from "@/lib/session";
+import { getMe, getPrayers } from "@/lib/session";
 import { AppShell } from "@/components/AppShell";
 import { SiteHeader } from "@/components/SiteHeader";
-import { Logo } from "@/components/Logo";
+import { Avatar } from "@/components/Avatar";
+import { PrayerCard } from "@/components/PrayerCard";
 import { Button, Card } from "@/components/ui";
 
 export default async function HomePage() {
@@ -42,27 +43,43 @@ export default async function HomePage() {
     );
   }
 
+  const { items: prayers } = await getPrayers({ limit: 30 });
+
   return (
     <AppShell me={me} pillar="prayer">
-      <Card className="p-8">
-        <div className="flex items-center gap-2 text-prayer">
-          <Logo withWordmark={false} />
-          <h1 className="text-2xl font-bold">Prayer Social</h1>
-        </div>
-        <p className="mt-2 max-w-2xl text-sm text-muted">
-          Welcome, {me.displayName}. The prayer wall — public requests, “I prayed” intercession,
-          comments and answered-prayer testimonials — arrives in Phase 2. Your account, profile, and
-          social graph are live now.
-        </p>
-        <div className="mt-5 flex gap-3">
-          <Link href={`/${me.handle}`}>
-            <Button>View your profile</Button>
-          </Link>
-          <Link href="/settings/profile">
-            <Button variant="outline">Edit profile</Button>
-          </Link>
-        </div>
+      {/* Compose prompt */}
+      <Card className="mb-4 flex items-center gap-3 p-4">
+        <Avatar name={me.displayName ?? me.handle ?? "You"} src={me.avatarUrl} size={40} />
+        <Link href="/prayers/new" className="flex-1">
+          <div className="rounded-full border border-line bg-white px-4 py-2.5 text-sm text-muted hover:border-brand">
+            Share a prayer request…
+          </div>
+        </Link>
+        <Link href="/prayers/new">
+          <Button>Post</Button>
+        </Link>
       </Card>
+
+      {prayers.length === 0 ? (
+        <Card className="p-10 text-center">
+          <h2 className="text-lg font-semibold">The wall is quiet</h2>
+          <p className="mx-auto mt-2 max-w-md text-sm text-muted">
+            Be the first to share a prayer request. When you post, it appears here for the community
+            to pray over.
+          </p>
+          <div className="mt-5">
+            <Link href="/prayers/new">
+              <Button>Share the first prayer</Button>
+            </Link>
+          </div>
+        </Card>
+      ) : (
+        <div className="space-y-4">
+          {prayers.map((prayer) => (
+            <PrayerCard key={prayer.id} prayer={prayer} canPray />
+          ))}
+        </div>
+      )}
     </AppShell>
   );
 }

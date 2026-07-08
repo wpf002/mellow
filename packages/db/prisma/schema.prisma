@@ -19,6 +19,12 @@ enum Visibility {
   PRIVATE
 }
 
+// Lifecycle of a prayer request. Answered prayers carry a testimonial.
+enum PrayerStatus {
+  OPEN
+  ANSWERED
+}
+
 // ---------------------------------------------------------------------------
 // Auth (Better Auth core) + Mellow profile fields
 // Better Auth owns: name, email, emailVerified, image, timestamps, and the
@@ -49,6 +55,12 @@ model User {
   // --- Social graph ---
   following Follow[] @relation("follower") // rows where this user is the follower
   followers Follow[] @relation("following") // rows where this user is followed
+
+  // --- Prayer Social (Phase 2) ---
+  prayers      Prayer[]
+  prayerLogs   PrayerLog[]
+  comments     Comment[]
+  testimonials Testimonial[]
 
   @@index([handle])
 }
@@ -111,4 +123,74 @@ model Follow {
 
   @@id([followerId, followingId])
   @@index([followingId])
+}
+
+// ---------------------------------------------------------------------------
+// Prayer Social (Phase 2)
+//
+// Prayer is the core content entity. Intercession ("I prayed") is recorded as
+// append-only PrayerLog events — never mutated or deleted — so they can feed
+// streaks and reputation later. Derived counts (uniquePrayed / totalPrayed) are
+// computed from those events in the query layer, never stored on Prayer.
+// ---------------------------------------------------------------------------
+
+model Prayer {
+  id         String       @id @default(cuid())
+  authorId   String
+  author     User         @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  title      String? // optional short heading
+  body       String
+  visibility Visibility   @default(PUBLIC)
+  status     PrayerStatus @default(OPEN)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  answeredAt DateTime? // set when status flips to ANSWERED
+
+  logs        PrayerLog[]
+  comments    Comment[]
+  testimonial Testimonial? // one testimonial per answered prayer
+
+  @@index([authorId])
+  // Wall + profile listing order (newest first) and cursor pagination.
+  @@index([createdAt, id])
+  @@index([visibility, createdAt])
+}
+
+// Append-only intercession event. A user may pray for the same request more
+// than once (each press is an event). uniquePrayed = distinct userId.
+model PrayerLog {
+  id        String   @id @default(cuid())
+  prayerId  String
+  prayer    Prayer   @relation(fields: [prayerId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([prayerId])
+  @@index([prayerId, userId])
+  @@index([userId, createdAt])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  prayerId  String
+  prayer    Prayer   @relation(fields: [prayerId], references: [id], onDelete: Cascade)
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  body      String
+  createdAt DateTime @default(now())
+
+  @@index([prayerId, createdAt])
+}
+
+// The answered-prayer testimonial. Exactly one per prayer (created by the author
+// when marking the prayer answered).
+model Testimonial {
+  id        String   @id @default(cuid())
+  prayerId  String   @unique
+  prayer    Prayer   @relation(fields: [prayerId], references: [id], onDelete: Cascade)
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  body      String
+  createdAt DateTime @default(now())
 }
