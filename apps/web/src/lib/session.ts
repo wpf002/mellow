@@ -4,6 +4,9 @@ import type {
   Challenge,
   Comment,
   Conversation,
+  Course,
+  CourseCategory,
+  CourseDetail,
   Group,
   Job,
   JobType,
@@ -182,6 +185,28 @@ export async function getMyTalent(): Promise<Talent | null> {
   if (!res.ok) return null;
   const data = (await res.json()) as Talent | { profile: null };
   return "profile" in data ? null : data;
+}
+
+/** Published courses, optionally filtered by category. */
+export async function getCourses(category?: CourseCategory): Promise<Page<Course>> {
+  const qs = category ? `&category=${category}` : "";
+  const res = await serverFetch(`/courses?limit=50${qs}`);
+  if (!res.ok) return { items: [], nextCursor: null };
+  return (await res.json()) as Page<Course>;
+}
+
+/** Course detail with lessons, or null (drafts are author-only). */
+export async function getCourse(id: string): Promise<CourseDetail | null> {
+  const res = await serverFetch(`/courses/${encodeURIComponent(id)}`);
+  if (!res.ok) return null;
+  return (await res.json()) as CourseDetail;
+}
+
+/** The viewer's learning: enrolled courses + courses they teach. */
+export async function getMyCourses(): Promise<{ enrolled: Course[]; teaching: Course[] }> {
+  const res = await serverFetch("/my/courses");
+  if (!res.ok) return { enrolled: [], teaching: [] };
+  return (await res.json()) as { enrolled: Course[]; teaching: Course[] };
 }
 
 /** Messages in a conversation (oldest-first) plus the other participant. */

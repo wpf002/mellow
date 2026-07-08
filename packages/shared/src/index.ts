@@ -11,3 +11,4 @@ export * from "./post.js";
 export * from "./message.js";
 export * from "./reputation.js";
 export * from "./calling.js";
+export * from "./equipping.js";

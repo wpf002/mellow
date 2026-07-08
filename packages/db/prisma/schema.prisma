@@ -54,6 +54,18 @@ enum JobStatus {
   CLOSED
 }
 
+// Equipping Center course topic.
+enum CourseCategory {
+  DISCIPLESHIP
+  BIBLE_STUDY
+  THEOLOGY
+  PRAYER
+  LEADERSHIP
+  EVANGELISM
+  FAMILY
+  OTHER
+}
+
 // What kind of service earned reputation. Weights live in code (pure config),
 // so history is stable if weights are re-tuned.
 enum ReputationCategory {
@@ -123,6 +135,11 @@ model User {
   // --- Calling Center (Phase 7) ---
   jobListings   JobListing[]
   talentProfile TalentProfile?
+
+  // --- Equipping Center (Phase 8) ---
+  courses           Course[]
+  enrollments       Enrollment[]
+  lessonCompletions LessonCompletion[]
 
   @@index([handle])
 }
@@ -511,4 +528,66 @@ model TalentProfile {
   updatedAt    DateTime @updatedAt
 
   @@index([visible, updatedAt])
+}
+
+// ---------------------------------------------------------------------------
+// Equipping Center (Phase 8) — the learning SURFACE only. Deliberately deferred
+// behind product/legal review: creator payouts / monetization and content
+// moderation. Courses are free; enrollment just tracks derived progress.
+// ---------------------------------------------------------------------------
+
+model Course {
+  id        String         @id @default(cuid())
+  authorId  String
+  author    User           @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  title     String
+  summary   String
+  category  CourseCategory @default(OTHER)
+  published Boolean        @default(false) // drafts are visible only to the author
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  lessons     Lesson[]
+  enrollments Enrollment[]
+
+  @@index([published, createdAt])
+  @@index([authorId])
+}
+
+model Lesson {
+  id        String   @id @default(cuid())
+  courseId  String
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  title     String
+  body      String
+  order     Int // 1-based position within the course
+  createdAt DateTime @default(now())
+
+  completions LessonCompletion[]
+
+  @@index([courseId, order])
+}
+
+model Enrollment {
+  courseId   String
+  course     Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  enrolledAt DateTime @default(now())
+
+  @@id([courseId, userId])
+  @@index([userId])
+}
+
+// Per-lesson completion (idempotent per user+lesson). Course progress is
+// DERIVED — completions / total lessons — never stored on Course/Enrollment.
+model LessonCompletion {
+  lessonId    String
+  lesson      Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  completedAt DateTime @default(now())
+
+  @@id([lessonId, userId])
+  @@index([userId])
 }

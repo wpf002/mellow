@@ -136,7 +136,25 @@ Better Auth is pinned to **`~1.2.12`** (the last zod-3 line) and `package.json` 
   `CloseJobButton`), `/calling/talent` directory + own-profile `TalentEditor` (+ `CallingSubnav`
   Openings/Talent). Verified: post → browse → detail → contact reuses the existing 1:1 conversation
   (Phase-4 dedupe) → close flips to Closed + drops off the board; non-poster close 403; talent
-  upsert + directory listing. **Equipping Center is still the last placeholder.**
+  upsert + directory listing.
+- **Phase 8** (Equipping Center — the gold pillar, **learning surface only**) — **built + verified in
+  browser + committed/pushed.** Ships as a real surface (not "coming soon"); **creator payouts /
+  monetization and content moderation stay deferred behind review** — courses are free, enrollment
+  just tracks derived progress. Models `Course` + `CourseCategory` enum, `Lesson`, `Enrollment`,
+  `LessonCompletion` (migration `phase8_equipping_center`). API in `apps/api/src/routes/equipping.ts`:
+  `/courses` create(draft)/list(published, `?category=`)/detail(draft→author-only 404), `:id/publish`
+  + `:id/lessons` (author-only 403), `:id/enroll`, `/lessons/:id/complete` (enrolled-only 403,
+  idempotent), `/my/courses` (enrolled + teaching). Progress is **derived** (viewer completions /
+  total lessons) via batch serializer `lib/serializeCourse.ts` — never stored. Shared: `equipping.ts`
+  (`COURSE_CATEGORY_LABEL` shared web+api). Web: `/equipping` catalog + category chips, `/equipping/new`,
+  `/equipping/[id]` (single `CourseView` client component: enroll, lesson accordion + mark-complete,
+  progress bar, author publish/unpublish + add-lesson — all mutate and re-render from the returned
+  detail), `/equipping/my` (Enrolled + Teaching), `EquippingSubnav`. Verified: create draft → add
+  lessons → publish → catalog → 2nd user enrolls → completes lessons (1/2 → 2/2 "Course complete",
+  idempotent) → My Learning; author-not-enrolled complete 403, non-author lesson-add 403, draft 404
+  to non-authors. **All four pillars now ship as real product surfaces** — `PillarPlaceholder`
+  removed. Deferred backlog (tokenomics/web3/DAO/on-chain + Calling & Equipping monetization) still
+  needs Will's explicit go.
 
 ### Dev env gotcha (Phase 4 — don't revert)
 `.claude/launch.json` pins **Node 24** for both `api` and `web` by prepending
