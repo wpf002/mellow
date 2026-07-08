@@ -155,6 +155,15 @@ Better Auth is pinned to **`~1.2.12`** (the last zod-3 line) and `package.json` 
   to non-authors. **All four pillars now ship as real product surfaces** — `PillarPlaceholder`
   removed. Deferred backlog (tokenomics/web3/DAO/on-chain + Calling & Equipping monetization) still
   needs Will's explicit go.
+- **Deferred backlog scaffold** (`packages/deferred`, `@mellow/deferred`) — **structure only, inert.**
+  Reserves the shape of the deferred items (tokenomics/MUST/veMUST, DAO, on-chain donations, Eternal
+  Profile web3 DID, Eternal Vault custody, Calling fees, Equipping payouts) as documented interfaces
+  + a hard OFF gate (`isCleared()` always false; factories throw `DeferredFeatureError`). NOT a dep of
+  api/web — nothing is wired. `DEFERRED_GATES` in `src/index.ts` + the README record each item's
+  legal/security gate and definition-of-ready. None is core to the app; all still need Will's go.
+  Risk tiers differ (per the reasons discussion): securities/custody/KYC items (token/DAO/donations/
+  vault) are the real blockers; the two monetization layers are ordinary payments diligence and could
+  be greenlit sooner if Will chooses.
 
 ### Dev env gotcha (Phase 4 — don't revert)
 `.claude/launch.json` pins **Node 24** for both `api` and `web` by prepending
