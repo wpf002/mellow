@@ -10,6 +10,7 @@ import {
 import { getUserId, requireUserId } from "../lib/session.js";
 import { serializePost, serializePosts } from "../lib/serializePost.js";
 import { rankFeed } from "../lib/feedRanker.js";
+import { emitReputation } from "../lib/reputation.js";
 
 const idParams = z.object({ id: z.string().min(1) });
 
@@ -52,6 +53,7 @@ export async function registerPostRoutes(app: FastifyInstance) {
       data: { authorId: userId, body: parsed.data.body, visibility: parsed.data.visibility },
       include: { author: true },
     });
+    await emitReputation(userId, "FELLOWSHIP", post.id);
     return reply.code(201).send(await serializePost(post, userId));
   });
 
@@ -151,6 +153,7 @@ export async function registerPostRoutes(app: FastifyInstance) {
       data: { postId: post.id, authorId: userId, body: parsedBody.data.body },
       include: { author: true },
     });
+    await emitReputation(userId, "ENCOURAGEMENT", comment.id);
     return reply.code(201).send({
       id: comment.id,
       body: comment.body,

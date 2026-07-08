@@ -10,6 +10,7 @@ import {
 } from "@mellow/shared";
 import { getUserId, requireUserId } from "../lib/session.js";
 import { serializePrayer, serializePrayers } from "../lib/serializePrayer.js";
+import { emitReputation } from "../lib/reputation.js";
 
 const idParams = z.object({ id: z.string().min(1) });
 const listQuery = cursorQuerySchema.extend({ author: handleSchema.optional() });
@@ -70,6 +71,7 @@ export async function registerPrayerRoutes(app: FastifyInstance) {
       },
       include: prayerInclude,
     });
+    await emitReputation(userId, "PRAYER_POSTED", prayer.id);
     return reply.code(201).send(await serializePrayer(prayer, userId));
   });
 
@@ -170,6 +172,7 @@ export async function registerPrayerRoutes(app: FastifyInstance) {
     if (!prayer) return reply.code(404).send({ error: "Prayer not found" });
 
     await prisma.prayerLog.create({ data: { prayerId: prayer.id, userId } });
+    await emitReputation(userId, "INTERCESSION", prayer.id);
 
     const refreshed = await prisma.prayer.findUnique({
       where: { id: prayer.id },
@@ -197,6 +200,7 @@ export async function registerPrayerRoutes(app: FastifyInstance) {
       data: { prayerId: prayer.id, authorId: userId, body: parsedBody.data.body },
       include: { author: true },
     });
+    await emitReputation(userId, "ENCOURAGEMENT", comment.id);
     return reply.code(201).send({
       id: comment.id,
       body: comment.body,
@@ -241,6 +245,7 @@ export async function registerPrayerRoutes(app: FastifyInstance) {
         include: prayerInclude,
       });
     });
+    await emitReputation(userId, "TESTIMONY", prayer.id);
 
     return serializePrayer(prayer, userId);
   });

@@ -1,19 +1,24 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getMe, getPrayers, getProfile } from "@/lib/session";
+import { getAchievements, getMe, getPrayers, getProfile, getReputation } from "@/lib/session";
 import { AppShell } from "@/components/AppShell";
 import { Avatar } from "@/components/Avatar";
 import { Button, Card } from "@/components/ui";
 import { FollowButton } from "@/components/FollowButton";
 import { MessageButton } from "@/components/MessageButton";
 import { PrayerCard } from "@/components/PrayerCard";
+import { ReputationCard } from "@/components/ReputationCard";
 
 export default async function ProfilePage({ params }: { params: Promise<{ handle: string }> }) {
   const { handle } = await params;
   const [me, profile] = await Promise.all([getMe(), getProfile(handle)]);
   if (!profile) notFound();
 
-  const { items: prayers } = await getPrayers({ author: handle, limit: 30 });
+  const [{ items: prayers }, reputation, { items: achievements }] = await Promise.all([
+    getPrayers({ author: handle, limit: 30 }),
+    getReputation(handle),
+    getAchievements(handle),
+  ]);
   const name = profile.displayName ?? `@${profile.handle}`;
 
   return (
@@ -57,6 +62,12 @@ export default async function ProfilePage({ params }: { params: Promise<{ handle
           </div>
         </div>
       </Card>
+
+      {reputation && (
+        <div className="mt-4">
+          <ReputationCard reputation={reputation} achievements={achievements} />
+        </div>
+      )}
 
       <div className="mt-4">
         <h2 className="mb-3 px-1 text-sm font-semibold text-muted">Prayers</h2>

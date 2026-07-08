@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import type {
+  AchievementView,
   Challenge,
   Comment,
   Conversation,
@@ -12,6 +13,7 @@ import type {
   PrayerAuthor,
   Prayer,
   PublicUser,
+  Reputation,
   Streak,
 } from "@mellow/shared";
 import { API_URL } from "./api";
@@ -125,6 +127,20 @@ export async function getConversations(): Promise<{ items: Conversation[] }> {
   const res = await serverFetch("/conversations");
   if (!res.ok) return { items: [] };
   return (await res.json()) as { items: Conversation[] };
+}
+
+/** Derived reputation (off-chain points, no monetary value). */
+export async function getReputation(handle: string): Promise<Reputation | null> {
+  const res = await serverFetch(`/users/${encodeURIComponent(handle)}/reputation`);
+  if (!res.ok) return null;
+  return (await res.json()) as Reputation;
+}
+
+/** Achievement catalog with earned state (lazy evaluation server-side). */
+export async function getAchievements(handle: string): Promise<{ items: AchievementView[] }> {
+  const res = await serverFetch(`/users/${encodeURIComponent(handle)}/achievements`);
+  if (!res.ok) return { items: [] };
+  return (await res.json()) as { items: AchievementView[] };
 }
 
 /** Messages in a conversation (oldest-first) plus the other participant. */

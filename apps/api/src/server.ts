@@ -9,6 +9,7 @@ import { registerPrayerLifeRoutes } from "./routes/prayerLife.js";
 import { registerChallengeRoutes } from "./routes/challenges.js";
 import { registerPostRoutes } from "./routes/posts.js";
 import { registerMessageRoutes } from "./routes/messages.js";
+import { registerReputationRoutes } from "./routes/reputation.js";
 
 async function main() {
   const app = Fastify({ logger: true });
@@ -49,6 +50,7 @@ async function main() {
   await registerChallengeRoutes(app);
   await registerPostRoutes(app);
   await registerMessageRoutes(app);
+  await registerReputationRoutes(app);
 
   const port = Number(process.env.API_PORT ?? 4000);
   await app.listen({ port, host: "0.0.0.0" });

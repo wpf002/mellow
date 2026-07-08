@@ -3,6 +3,7 @@ import { prisma } from "@mellow/db";
 import type { Streak } from "@mellow/shared";
 import { requireUserId } from "../lib/session.js";
 import { computeStreak, dbDateToDayString, localDayString } from "../lib/streak.js";
+import { emitReputation } from "../lib/reputation.js";
 
 /** Build the viewer's streak view from their PrayerDayMark events. */
 async function loadStreak(userId: string, timezone: string): Promise<Streak> {
@@ -27,11 +28,14 @@ export async function registerPrayerLifeRoutes(app: FastifyInstance) {
     if (!user) return reply.code(404).send({ error: "User not found" });
 
     const today = localDayString(new Date(), user.timezone);
-    await prisma.prayerDayMark.upsert({
-      where: { userId_date: { userId, date: new Date(`${today}T00:00:00.000Z`) } },
-      create: { userId, date: new Date(`${today}T00:00:00.000Z`) },
-      update: {},
+    const date = new Date(`${today}T00:00:00.000Z`);
+    const existing = await prisma.prayerDayMark.findUnique({
+      where: { userId_date: { userId, date } },
     });
+    if (!existing) {
+      await prisma.prayerDayMark.create({ data: { userId, date } });
+      await emitReputation(userId, "FAITHFULNESS", today); // once per local day
+    }
 
     return loadStreak(userId, user.timezone);
   });

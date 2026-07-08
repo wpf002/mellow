@@ -88,7 +88,24 @@ Better Auth is pinned to **`~1.2.12`** (the last zod-3 line) and `package.json` 
   button on profiles). Chat is **polling** (3s; SSE/websockets deferred per plan). Verified: post →
   feed (followed author affinity-boosted to top) → react (replace keeps total 1) + comment; two users
   DM with unread badges, read receipts, dedupe, and a live message arriving via polling.
-- **Next per plan: Phase 5** (Reputation & Achievements — off-chain).
+- **Phase 5** (Reputation & Achievements — off-chain) — **built + verified in browser +
+  committed/pushed.** Models `ReputationEvent` (append-only) + `ReputationCategory` enum /
+  `Achievement` / `UserAchievement` (migration `phase5_reputation_achievements`). Engine in
+  `apps/api/src/lib/reputation.ts`: weights live in code (`WEIGHTS`), score = **derived weighted sum
+  by category** (never stored), badge engine = **pure function** over per-category tallies
+  (`ACHIEVEMENTS` catalog in code; DB rows upserted from it; awards idempotent via
+  `createMany skipDuplicates` on the `@@id([userId, achievementId])`). Events emitted from action
+  routes via fire-and-forget `emitReputation` (never breaks the action): prayer create + group
+  prayer → PRAYER_POSTED, `/pray` → INTERCESSION, prayer/post comments → ENCOURAGEMENT, `/answer` →
+  TESTIMONY, post create → FELLOWSHIP, day mark → FAITHFULNESS (only when newly marked — mark/join
+  routes now check-then-create instead of upsert so idempotent repeats don't double-emit), group or
+  challenge create/join → COMMUNITY. API: `GET /users/:handle/reputation` + `/achievements`
+  (evaluation runs lazily on the achievements read). Web: `ReputationCard` on `/[handle]` — score
+  labeled "**no monetary value**", category chips, badge shelf (earned gold / unearned grayed).
+  Verified: fresh actions → score 8 (2+3+2+1 per weights) → 3/8 badges awarded once (idempotent
+  re-eval) → browser day-mark emits FAITHFULNESS (8→11) → idempotent re-mark stays 11. **No
+  backfill**: activity predating Phase 5 earns nothing (events are the source of truth).
+- **Next per plan: Phase 6** (AI Layer — Flint: Agape re-rank behind flag, Prayer Companion).
 
 ### Dev env gotcha (Phase 4 — don't revert)
 `.claude/launch.json` pins **Node 24** for both `api` and `web` by prepending

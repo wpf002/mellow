@@ -40,6 +40,18 @@ enum ReactionType {
   LOVE
 }
 
+// What kind of service earned reputation. Weights live in code (pure config),
+// so history is stable if weights are re-tuned.
+enum ReputationCategory {
+  PRAYER_POSTED // shared a prayer request
+  INTERCESSION // prayed for someone ("I prayed")
+  ENCOURAGEMENT // commented on a prayer or post
+  TESTIMONY // marked a prayer answered with a testimonial
+  FELLOWSHIP // posted to the fellowship feed
+  FAITHFULNESS // marked a daily prayer day
+  COMMUNITY // created or joined a group / challenge
+}
+
 // ---------------------------------------------------------------------------
 // Auth (Better Auth core) + Mellow profile fields
 // Better Auth owns: name, email, emailVerified, image, timestamps, and the
@@ -89,6 +101,10 @@ model User {
   postComments        PostComment[]
   conversationMembers ConversationMember[]
   messages            Message[]
+
+  // --- Reputation & Achievements (Phase 5, off-chain) ---
+  reputationEvents ReputationEvent[]
+  achievements     UserAchievement[]
 
   @@index([handle])
 }
@@ -388,4 +404,52 @@ model Message {
   createdAt      DateTime     @default(now())
 
   @@index([conversationId, createdAt])
+}
+
+// ---------------------------------------------------------------------------
+// Reputation & Achievements (Phase 5) — OFF-CHAIN ONLY.
+//
+// Reputation points have NO monetary value (tokenomics deferred behind legal
+// review; the future Eternal Profile web3 layer mirrors this later).
+// ReputationEvent is append-only — never mutate or delete history. Scores are
+// a derived weighted sum by category (weights live in code); the badge engine
+// is a pure function over event tallies. UserAchievement rows record awards
+// idempotently (unique per user+achievement).
+// ---------------------------------------------------------------------------
+
+model ReputationEvent {
+  id        String             @id @default(cuid())
+  userId    String
+  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category  ReputationCategory
+  // What earned it (prayer id, post id, group id…) — for audit/dedupe, not joins.
+  refId     String?
+  createdAt DateTime           @default(now())
+
+  @@index([userId, category])
+  @@index([userId, createdAt])
+}
+
+// Achievement catalog row. The source of truth for definitions (code, title,
+// criteria) lives in the pure badge engine; rows are upserted from it so
+// awards have a stable FK target.
+model Achievement {
+  id          String   @id @default(cuid())
+  code        String   @unique // e.g. "FIRST_PRAYER", "INTERCESSOR_10"
+  title       String
+  description String
+  createdAt   DateTime @default(now())
+
+  awards UserAchievement[]
+}
+
+model UserAchievement {
+  userId        String
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievementId String
+  achievement   Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+  awardedAt     DateTime    @default(now())
+
+  @@id([userId, achievementId])
+  @@index([userId])
 }

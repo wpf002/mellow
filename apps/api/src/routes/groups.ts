@@ -9,6 +9,7 @@ import {
 } from "@mellow/shared";
 import { getUserId, requireUserId } from "../lib/session.js";
 import { serializePrayer, serializePrayers } from "../lib/serializePrayer.js";
+import { emitReputation } from "../lib/reputation.js";
 
 const idParams = z.object({ id: z.string().min(1) });
 const prayerInclude = { author: true, testimonial: true, group: true } as const;
@@ -79,6 +80,7 @@ export async function registerGroupRoutes(app: FastifyInstance) {
       },
       include: { owner: true },
     });
+    await emitReputation(userId, "COMMUNITY", group.id);
     return reply.code(201).send(await serializeGroup(group, userId));
   });
 
@@ -132,11 +134,13 @@ export async function registerGroupRoutes(app: FastifyInstance) {
     });
     if (!group) return reply.code(404).send({ error: "Group not found" });
 
-    await prisma.groupMember.upsert({
+    const existing = await prisma.groupMember.findUnique({
       where: { groupId_userId: { groupId: group.id, userId } },
-      create: { groupId: group.id, userId, role: "MEMBER" },
-      update: {},
     });
+    if (!existing) {
+      await prisma.groupMember.create({ data: { groupId: group.id, userId, role: "MEMBER" } });
+      await emitReputation(userId, "COMMUNITY", group.id); // only on an actual join, not idempotent re-joins
+    }
     return serializeGroup(group, userId);
   });
 
@@ -189,6 +193,7 @@ export async function registerGroupRoutes(app: FastifyInstance) {
       },
       include: prayerInclude,
     });
+    await emitReputation(userId, "PRAYER_POSTED", prayer.id);
     return reply.code(201).send(await serializePrayer(prayer, userId));
   });
 

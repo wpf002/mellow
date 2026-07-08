@@ -4,6 +4,7 @@ import { prisma, type Challenge as ChallengeRow } from "@mellow/db";
 import { createChallengeSchema, type Challenge } from "@mellow/shared";
 import { getUserId, requireUserId } from "../lib/session.js";
 import { daysInWindow, dbDateToDayString } from "../lib/streak.js";
+import { emitReputation } from "../lib/reputation.js";
 
 const idParams = z.object({ id: z.string().min(1) });
 
@@ -84,6 +85,7 @@ export async function registerChallengeRoutes(app: FastifyInstance) {
         endDate: new Date(`${endDate}T00:00:00.000Z`),
       },
     });
+    await emitReputation(userId, "COMMUNITY", challenge.id);
     return reply.code(201).send((await serializeChallenges([challenge], userId))[0]);
   });
 
@@ -98,11 +100,13 @@ export async function registerChallengeRoutes(app: FastifyInstance) {
     const challenge = await prisma.challenge.findUnique({ where: { id: parsed.data.id } });
     if (!challenge) return reply.code(404).send({ error: "Challenge not found" });
 
-    await prisma.challengeParticipation.upsert({
+    const existing = await prisma.challengeParticipation.findUnique({
       where: { challengeId_userId: { challengeId: challenge.id, userId } },
-      create: { challengeId: challenge.id, userId },
-      update: {},
     });
+    if (!existing) {
+      await prisma.challengeParticipation.create({ data: { challengeId: challenge.id, userId } });
+      await emitReputation(userId, "COMMUNITY", challenge.id); // only on an actual join
+    }
     return (await serializeChallenges([challenge], userId))[0];
   });
 }
