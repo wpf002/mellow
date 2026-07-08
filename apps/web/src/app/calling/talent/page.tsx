@@ -61,7 +61,7 @@ export default async function TalentPage() {
               {t.skills.length > 0 && (
                 <div className="mt-3 flex flex-wrap gap-1.5">
                   {t.skills.map((s) => (
-                    <span key={s} className="rounded-full bg-calling-soft px-2.5 py-0.5 text-xs font-medium text-calling">
+                    <span key={s} className="rounded-full bg-calling-soft px-2.5 py-0.5 text-xs font-medium text-calling capitalize">
                       {s}
                     </span>
                   ))}
