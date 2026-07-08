@@ -1,0 +1,11 @@
+# Never ship local secrets or machine-specific artifacts into the image.
+**/.env
+**/.env.*
+!**/.env.example
+**/node_modules
+**/.next
+**/dist
+**/.turbo
+.git
+.claude
+**/*.log
