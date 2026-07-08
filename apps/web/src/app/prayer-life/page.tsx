@@ -23,7 +23,7 @@ export default async function PrayerLifePage() {
       <PrayerSubnav active="life" />
 
       <Card className="p-6">
-        <h1 className="text-lg font-semibold">Your prayer life</h1>
+        <h1 className="text-lg font-semibold">Your Prayer Life</h1>
         <p className="mt-1 text-sm text-muted">
           Mark each day you pray. Streaks are computed in your timezone ({me.timezone}).
         </p>

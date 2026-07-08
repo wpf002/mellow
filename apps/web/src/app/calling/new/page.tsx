@@ -15,7 +15,7 @@ export default async function NewJobPage() {
       <CallingSubnav active="openings" />
       <div className="mx-auto max-w-2xl">
         <Link href="/calling" className="text-sm text-muted hover:underline">
-          ← All openings
+          ← All Openings
         </Link>
         <h1 className="mt-2 mb-4 text-2xl font-bold">Post an opening</h1>
         <JobComposer />

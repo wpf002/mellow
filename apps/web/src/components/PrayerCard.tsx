@@ -53,7 +53,7 @@ export function PrayerCard({ prayer, canPray }: { prayer: Prayer; canPray: boole
 
       {answered && prayer.testimonial && (
         <div className="mt-3 rounded-xl border border-calling-soft bg-calling-soft/40 p-3">
-          <p className="text-xs font-semibold text-calling">Answered-prayer testimony</p>
+          <p className="text-xs font-semibold text-calling">Answered-Prayer Testimony</p>
           <p className="mt-1 line-clamp-3 text-sm whitespace-pre-wrap">{prayer.testimonial.body}</p>
         </div>
       )}

@@ -51,7 +51,7 @@ export function SignInForm() {
         </Field>
         {error && <p className="text-sm text-brand">{error}</p>}
         <Button type="submit" className="w-full" disabled={loading}>
-          {loading ? "Signing in…" : "Sign in"}
+          {loading ? "Signing in…" : "Sign In"}
         </Button>
       </form>
       <p className="mt-4 text-center text-sm text-muted">

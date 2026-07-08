@@ -26,12 +26,21 @@ export default async function ProfilePage({ params }: { params: Promise<{ handle
       <Card className="overflow-hidden">
         <div className="h-24 bg-gradient-to-r from-prayer to-[#f0a58f]" />
         <div className="px-6 pb-6">
-          <div className="-mt-10 flex items-end justify-between">
+          {/* Avatar overlaps the banner; actions sit below it, on the name row. */}
+          <div className="-mt-10">
             <Avatar name={name} src={profile.avatarUrl} size={80} className="ring-4 ring-surface" />
-            <div className="mb-1">
+          </div>
+
+          <div className="mt-3 flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <h1 className="text-xl font-bold">{name}</h1>
+              <p className="text-sm text-muted">@{profile.handle}</p>
+              {profile.bio && <p className="mt-3 text-sm">{profile.bio}</p>}
+            </div>
+            <div className="shrink-0">
               {profile.isViewer ? (
                 <Link href="/settings/profile">
-                  <Button variant="outline">Edit profile</Button>
+                  <Button variant="outline">Edit Profile</Button>
                 </Link>
               ) : me ? (
                 <div className="flex gap-2">
@@ -44,12 +53,6 @@ export default async function ProfilePage({ params }: { params: Promise<{ handle
                 </Link>
               )}
             </div>
-          </div>
-
-          <div className="mt-3">
-            <h1 className="text-xl font-bold">{name}</h1>
-            <p className="text-sm text-muted">@{profile.handle}</p>
-            {profile.bio && <p className="mt-3 text-sm">{profile.bio}</p>}
           </div>
 
           <div className="mt-4 flex gap-5 text-sm">

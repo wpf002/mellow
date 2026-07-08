@@ -32,12 +32,12 @@ export function CourseView({ initial, signedIn }: { initial: CourseDetail; signe
   return (
     <div className="mx-auto max-w-2xl">
       <Link href="/equipping" className="text-sm text-muted hover:underline">
-        ← All courses
+        ← All Courses
       </Link>
 
       <Card className="mt-2 p-6">
         <div className="flex items-start justify-between gap-3">
-          <span className="rounded-full bg-equipping-soft px-2.5 py-1 text-xs font-semibold text-equipping">
+          <span className="rounded-full bg-equipping-soft px-2.5 py-1 text-xs font-semibold text-equipping-ink">
             {COURSE_CATEGORY_LABEL[course.category]}
           </span>
           {!course.published && (
@@ -67,7 +67,7 @@ export function CourseView({ initial, signedIn }: { initial: CourseDetail; signe
                 <div className="h-full rounded-full bg-equipping" style={{ width: `${pct}%` }} />
               </div>
               {total > 0 && completed === total && (
-                <p className="mt-2 text-sm font-semibold text-equipping">✓ Course complete — well done!</p>
+                <p className="mt-2 text-sm font-semibold text-equipping-ink">✓ Course complete — well done!</p>
               )}
             </div>
           ) : course.isAuthor ? null : signedIn ? (
@@ -80,7 +80,7 @@ export function CourseView({ initial, signedIn }: { initial: CourseDetail; signe
             </Button>
           ) : (
             <Link href="/sign-in">
-              <Button variant="outline">Sign in to enroll</Button>
+              <Button variant="outline">Sign In to Enroll</Button>
             </Link>
           )}
         </div>
@@ -91,7 +91,7 @@ export function CourseView({ initial, signedIn }: { initial: CourseDetail; signe
         <Card className="mt-4 p-6">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <h2 className="text-sm font-semibold">Teaching tools</h2>
+              <h2 className="text-sm font-semibold">Teaching Tools</h2>
               <p className="text-xs text-muted">
                 {course.published ? "Published to the catalog." : "Draft — publish when ready."}
               </p>

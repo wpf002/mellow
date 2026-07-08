@@ -22,7 +22,7 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
       <CallingSubnav active="openings" />
       <div className="mx-auto max-w-2xl">
         <Link href="/calling" className="text-sm text-muted hover:underline">
-          ← All openings
+          ← All Openings
         </Link>
 
         <Card className="mt-2 p-6">
@@ -72,7 +72,7 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
                   <MessageButton handle={job.poster.handle} />
                 ) : (
                   <Link href="/sign-in">
-                    <Button variant="outline">Sign in to reach out</Button>
+                    <Button variant="outline">Sign In to Reach Out</Button>
                   </Link>
                 ))}
             </div>

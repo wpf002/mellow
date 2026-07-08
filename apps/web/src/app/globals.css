@@ -13,6 +13,8 @@
   --color-calling-soft: #d5ecdd;
   --color-equipping: #e6b84a;
   --color-equipping-soft: #f7eccf;
+  /* Bright gold fails contrast as text; this darker gold is for text/icons. */
+  --color-equipping-ink: #856314;
 
   --color-brand: #e0574a;
 

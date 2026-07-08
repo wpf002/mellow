@@ -36,7 +36,7 @@ export function ReputationCard({
     <Card className="p-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h2 className="text-sm font-semibold text-muted">Serve reputation</h2>
+          <h2 className="text-sm font-semibold text-muted">Serve Reputation</h2>
           <div className="mt-1 flex items-baseline gap-2">
             <span className="text-3xl font-bold text-prayer">{reputation.score}</span>
             <span className="text-xs text-muted">points · no monetary value</span>

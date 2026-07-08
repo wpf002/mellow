@@ -30,7 +30,7 @@ const PILLARS: { key: Pillar; label: string; href: string; active: string; idle:
     label: "Equipping Center",
     href: "/equipping",
     active: "bg-equipping text-white",
-    idle: "border border-equipping/50 text-equipping hover:bg-equipping-soft/50",
+    idle: "border border-equipping/50 text-equipping-ink hover:bg-equipping-soft/50",
   },
 ];
 

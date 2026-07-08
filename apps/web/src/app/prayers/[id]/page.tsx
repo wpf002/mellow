@@ -34,7 +34,7 @@ export default async function PrayerDetailPage({ params }: { params: Promise<{ i
     <AppShell me={me} pillar="prayer">
       <div className="mx-auto max-w-2xl">
         <Link href="/" className="text-sm text-muted hover:underline">
-          ← Back to the wall
+          ← Back to the Wall
         </Link>
 
         <Card className="mt-2 p-6">
@@ -86,7 +86,7 @@ export default async function PrayerDetailPage({ params }: { params: Promise<{ i
         {/* Testimonial / mark-answered */}
         {answered && prayer.testimonial ? (
           <Card className="mt-4 border-calling-soft bg-calling-soft/30 p-6">
-            <p className="text-sm font-semibold text-calling">Answered-prayer testimony</p>
+            <p className="text-sm font-semibold text-calling">Answered-Prayer Testimony</p>
             <p className="mt-2 text-sm whitespace-pre-wrap">{prayer.testimonial.body}</p>
             <p className="mt-3 text-xs text-muted">
               Answered {prayer.answeredAt ? formatDate(prayer.answeredAt) : ""}
@@ -120,7 +120,7 @@ export default async function PrayerDetailPage({ params }: { params: Promise<{ i
           ) : (
             <Card className="p-4 text-center text-sm text-muted">
               <Link href="/sign-in" className="text-brand hover:underline">
-                Sign in
+                Sign In
               </Link>{" "}
               to comment and pray.
             </Card>

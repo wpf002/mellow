@@ -32,7 +32,7 @@ export function SiteHeader({
                 </Link>
               ) : (
                 <Link href="/onboarding" className="text-sm font-medium text-brand">
-                  Finish setup
+                  Finish Setup
                 </Link>
               )}
               <SignOutButton />
@@ -40,10 +40,10 @@ export function SiteHeader({
           ) : showAuthActions ? (
             <>
               <Link href="/sign-in">
-                <Button variant="ghost">Sign in</Button>
+                <Button variant="ghost">Sign In</Button>
               </Link>
               <Link href="/sign-up">
-                <Button>Sign up</Button>
+                <Button>Sign Up</Button>
               </Link>
             </>
           ) : null}

@@ -19,7 +19,7 @@ export function EquippingSubnav({ active }: { active: EquippingSection }) {
           className={cn(
             "-mb-px border-b-2 px-4 py-2 text-sm font-semibold transition",
             l.key === active
-              ? "border-equipping text-equipping"
+              ? "border-equipping text-equipping-ink"
               : "border-transparent text-muted hover:text-ink",
           )}
         >

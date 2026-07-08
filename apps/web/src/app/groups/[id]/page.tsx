@@ -24,7 +24,7 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
     <AppShell me={me} pillar="prayer">
       <PrayerSubnav active="groups" />
       <Link href="/groups" className="text-sm text-muted hover:underline">
-        ← All groups
+        ← All Groups
       </Link>
 
       <Card className="mt-2 p-6">

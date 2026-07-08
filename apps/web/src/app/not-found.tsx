@@ -10,7 +10,7 @@ export default function NotFound() {
         <h1 className="text-2xl font-bold">Not found</h1>
         <p className="mt-2 text-sm text-muted">We couldn’t find that page.</p>
         <Link href="/" className="mt-6 inline-block">
-          <Button>Back home</Button>
+          <Button>Back Home</Button>
         </Link>
       </div>
     </div>

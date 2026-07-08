@@ -21,7 +21,7 @@ export default async function ConversationPage({ params }: { params: Promise<{ i
     <AppShell me={me} pillar="fellowship">
       <div className="mx-auto max-w-2xl">
         <Link href="/messages" className="text-sm text-muted hover:underline">
-          ← All messages
+          ← All Messages
         </Link>
 
         <Card className="mt-2 flex items-center gap-3 p-4">

@@ -40,7 +40,7 @@ export default async function MyLearningPage() {
       <section className="mt-8">
         <div className="mb-3 flex items-center justify-between px-1">
           <h2 className="text-sm font-semibold text-muted">Teaching</h2>
-          <Link href="/equipping/new" className="text-sm font-semibold text-equipping hover:underline">
+          <Link href="/equipping/new" className="text-sm font-semibold text-equipping-ink hover:underline">
             + New course
           </Link>
         </div>

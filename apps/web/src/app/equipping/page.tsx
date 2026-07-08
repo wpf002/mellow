@@ -27,7 +27,7 @@ export default async function EquippingPage({
             href="/equipping"
             className={cn(
               "rounded-full px-3 py-1.5 text-xs font-semibold transition",
-              !category ? "bg-equipping text-white" : "border border-equipping/50 text-equipping hover:bg-equipping-soft/50",
+              !category ? "bg-equipping text-white" : "border border-equipping/50 text-equipping-ink hover:bg-equipping-soft/50",
             )}
           >
             All
@@ -38,7 +38,7 @@ export default async function EquippingPage({
               href={`/equipping?category=${c}`}
               className={cn(
                 "rounded-full px-3 py-1.5 text-xs font-semibold transition",
-                category === c ? "bg-equipping text-white" : "border border-equipping/50 text-equipping hover:bg-equipping-soft/50",
+                category === c ? "bg-equipping text-white" : "border border-equipping/50 text-equipping-ink hover:bg-equipping-soft/50",
               )}
             >
               {COURSE_CATEGORY_LABEL[c]}

@@ -15,7 +15,7 @@ export default async function NewCoursePage() {
       <EquippingSubnav active="courses" />
       <div className="mx-auto max-w-2xl">
         <Link href="/equipping" className="text-sm text-muted hover:underline">
-          ← All courses
+          ← All Courses
         </Link>
         <h1 className="mt-2 mb-4 text-2xl font-bold">Teach a course</h1>
         <CourseComposer />

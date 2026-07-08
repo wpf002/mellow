@@ -32,12 +32,12 @@ export default async function HomePage() {
               <Link href="/sign-up">
                 {/* Inline color so the coral text reliably wins over the base `text-white`. */}
                 <Button className="bg-white hover:bg-white/90" style={{ color: "var(--color-prayer)" }}>
-                  Get started
+                  Get Started
                 </Button>
               </Link>
               <Link href="/sign-in">
                 <Button variant="ghost" className="text-white hover:bg-white/15">
-                  Sign in
+                  Sign In
                 </Button>
               </Link>
             </div>

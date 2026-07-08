@@ -10,7 +10,7 @@ export function CourseCard({ course }: { course: Course }) {
     <Link href={`/equipping/${course.id}`}>
       <Card className="flex h-full flex-col p-5 transition hover:border-equipping/60">
         <div className="flex items-start justify-between gap-3">
-          <span className="rounded-full bg-equipping-soft px-2.5 py-1 text-xs font-semibold text-equipping">
+          <span className="rounded-full bg-equipping-soft px-2.5 py-1 text-xs font-semibold text-equipping-ink">
             {COURSE_CATEGORY_LABEL[course.category]}
           </span>
           {!course.published && (

@@ -62,7 +62,7 @@ export default async function PostDetailPage({ params }: { params: Promise<{ id:
           ) : (
             <Card className="p-4 text-center text-sm text-muted">
               <Link href="/sign-in" className="text-fellowship hover:underline">
-                Sign in
+                Sign In
               </Link>{" "}
               to react and comment.
             </Card>
