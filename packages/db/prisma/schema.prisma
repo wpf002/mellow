@@ -7,4 +7,108 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Models are added phase by phase — see MELLOW_MVP_BUILD_PLAN.md.
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+// First-class visibility on user content. Enforced in the query layer, not the UI.
+enum Visibility {
+  PUBLIC
+  FRIENDS
+  GROUP
+  PRIVATE
+}
+
+// ---------------------------------------------------------------------------
+// Auth (Better Auth core) + Mellow profile fields
+// Better Auth owns: name, email, emailVerified, image, timestamps, and the
+// Session / Account / Verification models. Mellow adds the profile columns
+// (handle, displayName, avatarUrl, bio, timezone), set via our own /me routes.
+// ---------------------------------------------------------------------------
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  emailVerified Boolean  @default(false)
+  name          String // Better Auth core display name (set at sign-up)
+  image         String? // Better Auth core avatar (unused by product; see avatarUrl)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // --- Mellow profile ---
+  handle      String? @unique // @username, set once during onboarding
+  displayName String?
+  avatarUrl   String?
+  bio         String?
+  timezone    String  @default("UTC") // needed for streak math (Phase 3)
+
+  // --- Auth relations ---
+  sessions Session[]
+  accounts Account[]
+
+  // --- Social graph ---
+  following Follow[] @relation("follower") // rows where this user is the follower
+  followers Follow[] @relation("following") // rows where this user is followed
+
+  @@index([handle])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Account {
+  id                    String    @id @default(cuid())
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+}
+
+// ---------------------------------------------------------------------------
+// Social graph
+// ---------------------------------------------------------------------------
+
+model Follow {
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
+
+  follower  User @relation("follower", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation("following", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@id([followerId, followingId])
+  @@index([followingId])
+}

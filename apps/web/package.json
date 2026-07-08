@@ -13,10 +13,9 @@
     "next": "16.2.10",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "@mellow/db": "workspace:*",
     "@mellow/shared": "workspace:*",
     "@mellow/ui": "workspace:*",
-    "@mellow/ai": "workspace:*",
+    "better-auth": "~1.2.12",
     "zod": "^3.23.0"
   },
   "devDependencies": {

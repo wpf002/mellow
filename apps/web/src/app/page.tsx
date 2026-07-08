@@ -1,65 +1,68 @@
-import Image from "next/image";
+import { redirect } from "next/navigation";
+import Link from "next/link";
+import { getMe } from "@/lib/session";
+import { AppShell } from "@/components/AppShell";
+import { SiteHeader } from "@/components/SiteHeader";
+import { Logo } from "@/components/Logo";
+import { Button, Card } from "@/components/ui";
 
-export default function Home() {
+export default async function HomePage() {
+  const me = await getMe();
+
+  // Signed in but hasn't claimed a handle yet → finish onboarding.
+  if (me && !me.handle) redirect("/onboarding");
+
+  if (!me) {
+    return (
+      <div className="min-h-full">
+        <SiteHeader me={null} />
+        <section className="mx-auto flex max-w-3xl flex-col items-center px-4 py-20 text-center">
+          <div className="rounded-3xl bg-gradient-to-br from-prayer to-[#f0a58f] px-8 py-14 text-white shadow-sm">
+            <p className="text-sm font-semibold tracking-wide uppercase opacity-90">Prayer Social</p>
+            <h1 className="mt-3 text-4xl font-bold tracking-tight sm:text-5xl">
+              The one and only 100% free prayer app
+            </h1>
+            <p className="mx-auto mt-4 max-w-xl text-base opacity-95">
+              Share prayer requests, intercede for others across the world, and testify when prayers
+              are answered — connecting Christians worldwide.
+            </p>
+            <div className="mt-8 flex justify-center gap-3">
+              <Link href="/sign-up">
+                <Button className="bg-white text-prayer hover:bg-white/90">Get started</Button>
+              </Link>
+              <Link href="/sign-in">
+                <Button variant="ghost" className="text-white hover:bg-white/15">
+                  Sign in
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </section>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <AppShell me={me} pillar="prayer">
+      <Card className="p-8">
+        <div className="flex items-center gap-2 text-prayer">
+          <Logo withWordmark={false} />
+          <h1 className="text-2xl font-bold">Prayer Social</h1>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+        <p className="mt-2 max-w-2xl text-sm text-muted">
+          Welcome, {me.displayName}. The prayer wall — public requests, “I prayed” intercession,
+          comments and answered-prayer testimonials — arrives in Phase 2. Your account, profile, and
+          social graph are live now.
+        </p>
+        <div className="mt-5 flex gap-3">
+          <Link href={`/${me.handle}`}>
+            <Button>View your profile</Button>
+          </Link>
+          <Link href="/settings/profile">
+            <Button variant="outline">Edit profile</Button>
+          </Link>
         </div>
-      </main>
-    </div>
+      </Card>
+    </AppShell>
   );
 }

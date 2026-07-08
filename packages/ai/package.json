@@ -2,7 +2,12 @@
   "name": "@mellow/ai",
   "version": "0.0.0",
   "main": "src/index.ts",
+  "type": "module",
   "types": "src/index.ts",
-  "scripts": { "typecheck": "tsc --noEmit" },
-  "devDependencies": { "typescript": "^5.6.0" }
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0"
+  }
 }

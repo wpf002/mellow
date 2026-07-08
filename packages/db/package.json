@@ -2,14 +2,24 @@
   "name": "@mellow/db",
   "version": "0.0.0",
   "main": "src/index.ts",
+  "type": "module",
   "types": "src/index.ts",
   "scripts": {
     "generate": "prisma generate",
-    "migrate": "prisma migrate dev",
-    "studio": "prisma studio",
-    "seed": "tsx prisma/seed.ts",
-    "typecheck": "echo \"(db typecheck activates once the Prisma client is generated in Phase 1)\""
+    "migrate": "dotenv -e ../../.env -- prisma migrate dev",
+    "migrate:deploy": "prisma migrate deploy",
+    "push": "dotenv -e ../../.env -- prisma db push",
+    "studio": "dotenv -e ../../.env -- prisma studio",
+    "seed": "dotenv -e ../../.env -- tsx prisma/seed.ts",
+    "typecheck": "tsc --noEmit"
   },
-  "dependencies": { "@prisma/client": "^5.20.0" },
-  "devDependencies": { "prisma": "^5.20.0", "tsx": "^4.19.0", "typescript": "^5.6.0" }
+  "dependencies": {
+    "@prisma/client": "^5.20.0"
+  },
+  "devDependencies": {
+    "prisma": "^5.20.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "dotenv-cli": "^7.4.2"
+  }
 }

@@ -1,11 +1,15 @@
 {
-  "name": "@mellow/ui",
+  "name": "@mellow/auth",
   "version": "0.0.0",
   "main": "src/index.ts",
   "type": "module",
   "types": "src/index.ts",
   "scripts": {
     "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "better-auth": "~1.2.12",
+    "@mellow/db": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.6.0"
